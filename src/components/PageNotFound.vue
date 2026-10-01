@@ -1,5 +1,5 @@
 <template>
-    <main class="grid min-h-screen place-items-center bg-[#00204A] px-6 py-24 sm:py-32 lg:px-8">
+    <main class="grid min-h-screen place-items-center bg-[#084D52] px-6 py-24 sm:py-32 lg:px-8">
     <div class="text-center">
       <p class="text-base font-semibold text-indigo-600">404</p>
       <h1 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-5xl">Page not found</h1>

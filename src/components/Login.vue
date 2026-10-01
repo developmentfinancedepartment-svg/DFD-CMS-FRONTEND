@@ -1,19 +1,19 @@
 <template>
   <div class="min-h-screen flex bg-gray-50 font-sans">
     <!-- Left Side: ITMD Branding -->
-    <div class="hidden md:flex md:w-1/2 relative bg-[#032b5f] overflow-hidden">
+    <div class="hidden md:flex md:w-1/2 relative bg-brand-gradient overflow-hidden">
       <!-- Background Image with Overlay -->
       <div class="absolute inset-0 bg-login-wallpaper bg-cover bg-center opacity-50"></div>
-      <div class="absolute inset-0 bg-gradient-to-br from-[#032b5f] via-[#032b5f]/80 to-transparent"></div>
-      
+      <div class="absolute inset-0 bg-gradient-to-br from-[#084D52] via-[#084D52]/80 to-transparent"></div>
+
       <!-- Logo and Information -->
       <div class="relative z-10 p-12 flex flex-col items-center justify-center w-full text-center h-full">
         <div class="mb-8">
-           <img src="@/assets/logonew.png" alt="ITMD Logo" class="w-32 h-32 object-contain mx-auto drop-shadow-2xl" />
+           <!-- <img src="@/assets/logonew.png" alt="ITMD Logo" class="w-32 h-32 object-contain mx-auto drop-shadow-2xl" /> -->
         </div>
         <h1 class="text-4xl font-black text-white mb-2 tracking-tight uppercase"></h1>
         <p class="text-blue-100 font-bold tracking-[0.2em] uppercase text-xs opacity-80 leading-relaxed">
-          Information Technology<br/>Management Division
+         Department of Development Finance
         </p>
         <div class="w-16 h-1 bg-blue-500 rounded-full mt-8"></div>
       </div>
@@ -29,7 +29,7 @@
                <img src="@/assets/logonew.png" alt="ITMD Logo" class="w-20 h-20 object-contain" />
             </div>
             <h2 class="text-3xl font-bold text-gray-800">Welcome</h2>
-            <p class="text-gray-400 text-sm mt-1">Sign in to ITMD Admin Panel</p>
+            <p class="text-gray-400 text-sm mt-1">Sign in to DFD Admin Panel</p>
           </div>
 
           <form @submit.prevent="login" class="space-y-6">
@@ -56,7 +56,7 @@
                   required
                   class="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-gray-800 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
                 />
-                <button 
+                <button
                   type="button"
                   @click="showPassword = !showPassword"
                   class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
@@ -76,7 +76,7 @@
             <button
               type="submit"
               :disabled="isLoading"
-              class="w-full bg-[#032b5f] hover:bg-[#043d87] text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+              class="w-full bg-[#084D52] hover:bg-[#008E9B] text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <span v-if="!isLoading">Login</span>
               <div v-else class="flex items-center gap-2">
