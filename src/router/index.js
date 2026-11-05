@@ -15,10 +15,15 @@ import StaffMember from "@/components/StaffMember.vue";
 import EditStaff from "@/components/EditStaff.vue";
 import AdminManagement from "@/components/AdminManagement.vue"
 import AuditLogs from "@/components/AuditLogs.vue"
+import ManageSchemes from "@/components/ManageSchemes.vue"
+import ManageNewsView from "@/views/ManageNewsView.vue"
+import AdminPublicationsView from "@/views/AdminPublicationsView.vue"
+import AdminGalleryView from "@/views/AdminGalleryView.vue"
+import AdminFieldVisitsView from "@/views/AdminFieldVisitsView.vue"
 
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHashHistory('/cms-dfd/'),
   routes: [
     // ... existing routes ...
     {
@@ -116,6 +121,15 @@ const router = createRouter({
           },
         },
         {
+          path: "publications",
+          name: "admin-publications",
+          component: AdminPublicationsView,
+          meta: {
+            title: "Action Plans & Publications",
+            requiresAuth: true,
+          },
+        },
+        {
           path: "performance",
           name: "performance-home",
           component: PerformanceReport,
@@ -134,11 +148,56 @@ const router = createRouter({
           },
         },
         {
+          path: "gallery",
+          name: "admin-gallery-home",
+          component: AdminGalleryView,
+          meta: {
+            title: "Gallery Management",
+            requiresAuth: true,
+          },
+        },
+        {
+          path: "field-visits",
+          name: "admin-field-visits-home",
+          component: AdminFieldVisitsView,
+          meta: {
+            title: "Field Visits Management",
+            requiresAuth: true,
+          },
+        },
+        {
           path: "news",
           name: "news-home",
-          component: News,
+          component: ManageNewsView,
           meta: {
-            title: "News",
+            title: "News Ticker Headlines",
+            requiresAuth: true,
+          },
+        },
+        {
+          path: "manage-news",
+          name: "manage-news",
+          component: ManageNewsView,
+          meta: {
+            title: "Manage News",
+            requiresAuth: true,
+          },
+        },
+        {
+          path: "schemes",
+          name: "manage-schemes",
+          component: ManageSchemes,
+          meta: {
+            title: "Manage Schemes",
+            requiresAuth: true,
+          },
+        },
+        {
+          path: "services",
+          name: "admin-services",
+          component: ManageSchemes,
+          meta: {
+            title: "Manage Schemes",
             requiresAuth: true,
           },
         },
@@ -166,6 +225,42 @@ const router = createRouter({
 
     },
     {
+      path: "/admin/gallery",
+      component: HomePage,
+      meta: {
+        requiresAuth: true,
+      },
+      children: [
+        {
+          path: "",
+          name: "admin-gallery",
+          component: AdminGalleryView,
+          meta: {
+            title: "Gallery Management",
+            requiresAuth: true,
+          },
+        },
+      ],
+    },
+    {
+      path: "/admin/field-visits",
+      component: HomePage,
+      meta: {
+        requiresAuth: true,
+      },
+      children: [
+        {
+          path: "",
+          name: "admin-field-visits",
+          component: AdminFieldVisitsView,
+          meta: {
+            title: "Field Visits Management",
+            requiresAuth: true,
+          },
+        },
+      ],
+    },
+    {
       path: "/:catchAll(.*)",
       name: "notFound",
       component: PageNotFound,
@@ -181,7 +276,7 @@ router.beforeEach(async (to, from, next) => {
   
   // 1. Check authentication for protected routes
   if (to.meta.requiresAuth) {
-    if (!authStore.accessToken) {
+    if (!authStore.isAuthenticated) {
       next('/login');
       return;
     }

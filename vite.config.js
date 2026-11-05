@@ -12,9 +12,9 @@ export default defineConfig(({ mode }) => {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
     },
-    base: env.VITE_BASE_PATH || "/",
+    base: '/cms-dfd/',
     server: {
-      port: 80,
+      port: 5174,
       host: true,
     },
   };
