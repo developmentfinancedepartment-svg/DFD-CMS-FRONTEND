@@ -17,49 +17,49 @@
           </p>
         </div>
 
-        <!-- Metric KPI Cards (District-based) -->
+        <!-- Metric KPI Cards (Geographic & Temporal Summary) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 w-full xl:w-auto">
-          <!-- Total Visits -->
+          <!-- Card 1: TOTAL VISITS (Teal) -->
           <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
-            <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-[#008795] shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#008795] shrink-0">
               <i class="fas fa-clipboard-check text-sm"></i>
             </div>
             <div>
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Visits</p>
-              <span class="text-lg font-extrabold text-slate-900">{{ visits.length }}</span>
+              <span class="text-lg font-extrabold text-slate-900">{{ totalVisitsCount }}</span>
             </div>
           </div>
 
-          <!-- Kurunegala -->
+          <!-- Card 2: DISTRICTS REACHED (Indigo) -->
           <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
             <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-              <i class="fas fa-map-marker-alt text-sm"></i>
+              <i class="fas fa-map-marked-alt text-sm"></i>
             </div>
             <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kurunegala</p>
-              <span class="text-lg font-extrabold text-slate-900">{{ countDistrict('Kurunegala') }}</span>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Districts Reached</p>
+              <span class="text-lg font-extrabold text-slate-900">{{ districtsReachedFormatted }}</span>
             </div>
           </div>
 
-          <!-- Galle -->
-          <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-              <i class="fas fa-map-marker-alt text-sm"></i>
-            </div>
-            <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Galle</p>
-              <span class="text-lg font-extrabold text-slate-900">{{ countDistrict('Galle') }}</span>
-            </div>
-          </div>
-
-          <!-- Batticaloa & Kandy -->
+          <!-- Card 3: THIS MONTH (Amber) -->
           <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
             <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-              <i class="fas fa-map-marker-alt text-sm"></i>
+              <i class="fas fa-calendar-alt text-sm"></i>
             </div>
             <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Batticaloa / Kandy</p>
-              <span class="text-lg font-extrabold text-slate-900">{{ countDistrict('Batticaloa') + countDistrict('Kandy') }}</span>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">This Month</p>
+              <span class="text-lg font-extrabold text-slate-900">{{ thisMonthVisitsCount }}</span>
+            </div>
+          </div>
+
+          <!-- Card 4: PHOTO ARCHIVE (Emerald) -->
+          <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+              <i class="fas fa-images text-sm"></i>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Photo Archive</p>
+              <span class="text-lg font-extrabold text-slate-900">{{ totalPhotoArchiveCount }}</span>
             </div>
           </div>
         </div>
@@ -123,45 +123,135 @@
 
             <!-- District & Scheme Type Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <!-- District Dropdown -->
-              <div>
+              <!-- District Custom Dropdown -->
+              <div class="relative" ref="districtDropdownRef">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   District <span class="text-rose-500">*</span>
                 </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#008795]">
-                    <i class="fas fa-map-marker-alt text-xs"></i>
+                <!-- Trigger Button -->
+                <button
+                  type="button"
+                  @click="toggleDistrictDropdown"
+                  class="w-full flex items-center justify-between rounded-2xl border border-slate-200 px-3.5 py-2.5 bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20': isDistrictDropdownOpen }"
+                >
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i class="fas fa-map-marker-alt text-xs text-[#008795]"></i>
+                    <span class="font-semibold text-slate-800 text-xs truncate">
+                      {{ visitForm.district || 'Select District' }}
+                    </span>
                   </div>
-                  <select
-                    v-model="form.district"
-                    required
-                    class="w-full appearance-none pl-10 pr-9 py-2.5 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:border-[#008795] focus:ring-2 focus:ring-[#008795]/20 outline-none transition text-slate-800 cursor-pointer"
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180': isDistrictDropdownOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <option value="" disabled>Select District</option>
-                    <option v-for="d in districtOptions" :key="d" :value="d">{{ d }}</option>
-                  </select>
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Popover Card -->
+                <div
+                  v-if="isDistrictDropdownOpen"
+                  class="absolute left-0 right-0 top-full rounded-2xl shadow-xl border border-slate-100 bg-white overflow-hidden mt-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="bg-slate-50/70 border-b text-[11px] font-semibold text-slate-400 px-4 py-2.5">
+                    Select District
+                  </div>
+                  <div class="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
+                    <button
+                      v-for="d in districtOptions"
+                      :key="d"
+                      type="button"
+                      @click="selectDistrict(d)"
+                      class="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left"
+                      :class="visitForm.district === d
+                        ? 'bg-[#008795]/10 text-[#008795] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate">
+                        <i class="fas fa-map-marker-alt text-xs" :class="visitForm.district === d ? 'text-[#008795]' : 'text-slate-400'"></i>
+                        <span class="truncate">{{ d }}</span>
+                      </div>
+                      <svg
+                        v-if="visitForm.district === d"
+                        class="w-3.5 h-3.5 text-[#008795] shrink-0 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <!-- Scheme Type Input -->
-              <div>
+              <!-- Scheme Type Custom Dropdown -->
+              <div class="relative" ref="schemeDropdownRef">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Scheme Type <span class="text-rose-500">*</span>
                 </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-tags text-xs"></i>
+                <!-- Trigger Button -->
+                <button
+                  type="button"
+                  @click="toggleSchemeDropdown"
+                  class="w-full flex items-center justify-between rounded-2xl border border-slate-200 px-3.5 py-2.5 bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20': isSchemeDropdownOpen }"
+                >
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i class="fas fa-tags text-xs text-[#008795]"></i>
+                    <span class="font-semibold text-slate-800 text-xs truncate">
+                      {{ visitForm.schemeType || 'Select Scheme Type' }}
+                    </span>
                   </div>
-                  <input
-                    v-model="form.schemeType"
-                    type="text"
-                    required
-                    placeholder="e.g. SME Loan"
-                    class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-                  />
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180': isSchemeDropdownOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Popover Card -->
+                <div
+                  v-if="isSchemeDropdownOpen"
+                  class="absolute left-0 right-0 top-full rounded-2xl shadow-xl border border-slate-100 bg-white overflow-hidden mt-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="bg-slate-50/70 border-b text-[11px] font-semibold text-slate-400 px-4 py-2.5">
+                    Select Scheme Type
+                  </div>
+                  <div class="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
+                    <button
+                      v-for="s in schemeOptions"
+                      :key="s"
+                      type="button"
+                      @click="selectSchemeType(s)"
+                      class="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left"
+                      :class="visitForm.schemeType === s
+                        ? 'bg-[#008795]/10 text-[#008795] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate">
+                        <i class="fas fa-tags text-xs" :class="visitForm.schemeType === s ? 'text-[#008795]' : 'text-slate-400'"></i>
+                        <span class="truncate">{{ s }}</span>
+                      </div>
+                      <svg
+                        v-if="visitForm.schemeType === s"
+                        class="w-3.5 h-3.5 text-[#008795] shrink-0 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -286,35 +376,31 @@
         <!-- 3. VISITS LIST (Right: 7 cols) -->
         <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 lg:p-7 shadow-sm flex flex-col">
           
-          <!-- Filter & Search Bar (Static at top) -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 shrink-0">
-            <!-- Search -->
-            <div class="relative flex-1 max-w-xs">
-              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <!-- Smart Search Bar (Option 3 - Static at top) -->
+          <div class="pb-3 border-b border-slate-100 shrink-0">
+            <div class="relative w-full">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </span>
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search visits by title, district..."
-                class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-1 focus:ring-[#008795] outline-none transition text-slate-800"
+                placeholder="Search visits by title, district (e.g. Galle, Kandy), or scheme..."
+                class="w-full pl-10 pr-9 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 placeholder-slate-400 shadow-xs"
               />
-            </div>
-
-            <!-- District Filter Pills -->
-            <div class="flex flex-wrap items-center gap-1.5">
+              <!-- Clear button (x) when text entered -->
               <button
-                v-for="dist in filterDistricts"
-                :key="dist"
-                @click="selectedDistrict = dist"
-                :class="[
-                  'px-3 py-1 rounded-xl text-xs font-bold transition',
-                  selectedDistrict === dist
-                    ? 'bg-[#008795] text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                ]"
+                v-if="searchQuery"
+                type="button"
+                @click="searchQuery = ''"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                title="Clear search"
               >
-                {{ dist }}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
           </div>
@@ -336,7 +422,18 @@
                 <i class="fas fa-map-marked-alt text-2xl"></i>
               </div>
               <p class="text-sm font-bold text-slate-700">No field visits found</p>
-              <p class="text-xs text-slate-400 mt-1">Add inspections using the form on the left or try another filter.</p>
+              <p class="text-xs text-slate-400 mt-1">
+                {{ searchQuery ? 'No visits match your search query.' : 'Add inspections using the form on the left.' }}
+              </p>
+              <button
+                v-if="searchQuery"
+                type="button"
+                @click="searchQuery = ''"
+                class="mt-2.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer inline-flex items-center gap-1.5"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <span>Clear Search</span>
+              </button>
             </div>
 
             <!-- Cards Grid: Public UI Matching Cards -->
@@ -495,37 +592,136 @@
 
             <!-- District & Scheme Type -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
+              <!-- Edit District Custom Dropdown -->
+              <div class="relative" ref="editDistrictDropdownRef">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   District <span class="text-rose-500">*</span>
                 </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#008795]">
-                    <i class="fas fa-map-marker-alt text-xs"></i>
+                <!-- Trigger Button -->
+                <button
+                  type="button"
+                  @click="toggleEditDistrictDropdown"
+                  class="w-full flex items-center justify-between rounded-2xl border border-slate-200 px-3.5 py-2.5 bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20': isEditDistrictOpen }"
+                >
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i class="fas fa-map-marker-alt text-xs text-[#008795]"></i>
+                    <span class="font-semibold text-slate-800 text-xs truncate">
+                      {{ editForm.district || 'Select District' }}
+                    </span>
                   </div>
-                  <select
-                    v-model="editForm.district"
-                    required
-                    class="w-full appearance-none pl-10 pr-9 py-2.5 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:border-[#008795] focus:ring-2 focus:ring-[#008795]/20 outline-none transition text-slate-800 cursor-pointer"
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180': isEditDistrictOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <option v-for="d in districtOptions" :key="d" :value="d">{{ d }}</option>
-                  </select>
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Popover Card -->
+                <div
+                  v-if="isEditDistrictOpen"
+                  class="absolute left-0 right-0 top-full rounded-2xl shadow-xl border border-slate-100 bg-white overflow-hidden mt-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="bg-slate-50/70 border-b text-[11px] font-semibold text-slate-400 px-4 py-2.5">
+                    Select District
+                  </div>
+                  <div class="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
+                    <button
+                      v-for="d in districtOptions"
+                      :key="d"
+                      type="button"
+                      @click="selectEditDistrict(d)"
+                      class="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left"
+                      :class="editForm.district === d
+                        ? 'bg-[#008795]/10 text-[#008795] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate">
+                        <i class="fas fa-map-marker-alt text-xs" :class="editForm.district === d ? 'text-[#008795]' : 'text-slate-400'"></i>
+                        <span class="truncate">{{ d }}</span>
+                      </div>
+                      <svg
+                        v-if="editForm.district === d"
+                        class="w-3.5 h-3.5 text-[#008795] shrink-0 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div>
+              <!-- Edit Scheme Type Custom Dropdown -->
+              <div class="relative" ref="editSchemeDropdownRef">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Scheme Type <span class="text-rose-500">*</span>
                 </label>
-                <input
-                  v-model="editForm.schemeType"
-                  type="text"
-                  required
-                  class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-                />
+                <!-- Trigger Button -->
+                <button
+                  type="button"
+                  @click="toggleEditSchemeDropdown"
+                  class="w-full flex items-center justify-between rounded-2xl border border-slate-200 px-3.5 py-2.5 bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20': isEditSchemeOpen }"
+                >
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i class="fas fa-tags text-xs text-[#008795]"></i>
+                    <span class="font-semibold text-slate-800 text-xs truncate">
+                      {{ editForm.schemeType || 'Select Scheme Type' }}
+                    </span>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180': isEditSchemeOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Popover Card -->
+                <div
+                  v-if="isEditSchemeOpen"
+                  class="absolute left-0 right-0 top-full rounded-2xl shadow-xl border border-slate-100 bg-white overflow-hidden mt-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="bg-slate-50/70 border-b text-[11px] font-semibold text-slate-400 px-4 py-2.5">
+                    Select Scheme Type
+                  </div>
+                  <div class="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
+                    <button
+                      v-for="s in schemeOptions"
+                      :key="s"
+                      type="button"
+                      @click="selectEditSchemeType(s)"
+                      class="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left"
+                      :class="editForm.schemeType === s
+                        ? 'bg-[#008795]/10 text-[#008795] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate">
+                        <i class="fas fa-tags text-xs" :class="editForm.schemeType === s ? 'text-[#008795]' : 'text-slate-400'"></i>
+                        <span class="truncate">{{ s }}</span>
+                      </div>
+                      <svg
+                        v-if="editForm.schemeType === s"
+                        class="w-3.5 h-3.5 text-[#008795] shrink-0 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -820,6 +1016,18 @@ const districtOptions = [
 // Top filter districts
 const filterDistricts = ['All', 'Kurunegala', 'Galle', 'Batticaloa', 'Colombo', 'Kandy'];
 
+// Scheme options
+const schemeOptions = [
+  'Green Finance',
+  'Commercial Agriculture',
+  'Microfinance',
+  'SME Loan',
+  'Re-MSME Plus Loan Scheme',
+  'NPA Borrower Relief Scheme',
+  'Food Security Project',
+  'Working Capital Loan Scheme'
+];
+
 // State
 const visits = ref([]);
 const loading = ref(false);
@@ -863,6 +1071,7 @@ onUnmounted(() => {
     successTimeout = null;
   }
   window.removeEventListener('keydown', handleGlobalKeydown);
+  document.removeEventListener('click', handleClickOutside);
 });
 
 const errorMessage = ref('');
@@ -878,6 +1087,83 @@ const form = ref({
   images: []
 });
 const formCoverIndex = ref(0);
+const visitForm = form;
+
+// Custom Dropdown States
+const districtDropdownRef = ref(null);
+const schemeDropdownRef = ref(null);
+const editDistrictDropdownRef = ref(null);
+const editSchemeDropdownRef = ref(null);
+
+const isDistrictDropdownOpen = ref(false);
+const isSchemeDropdownOpen = ref(false);
+const isEditDistrictOpen = ref(false);
+const isEditSchemeOpen = ref(false);
+
+const toggleDistrictDropdown = () => {
+  isDistrictDropdownOpen.value = !isDistrictDropdownOpen.value;
+  if (isDistrictDropdownOpen.value) {
+    isSchemeDropdownOpen.value = false;
+  }
+};
+
+const toggleSchemeDropdown = () => {
+  isSchemeDropdownOpen.value = !isSchemeDropdownOpen.value;
+  if (isSchemeDropdownOpen.value) {
+    isDistrictDropdownOpen.value = false;
+  }
+};
+
+const toggleEditDistrictDropdown = () => {
+  isEditDistrictOpen.value = !isEditDistrictOpen.value;
+  if (isEditDistrictOpen.value) {
+    isEditSchemeOpen.value = false;
+  }
+};
+
+const toggleEditSchemeDropdown = () => {
+  isEditSchemeOpen.value = !isEditSchemeOpen.value;
+  if (isEditSchemeOpen.value) {
+    isEditDistrictOpen.value = false;
+  }
+};
+
+const selectDistrict = (d) => {
+  visitForm.value.district = d;
+  visitForm.value.region = d;
+  isDistrictDropdownOpen.value = false;
+};
+
+const selectSchemeType = (s) => {
+  visitForm.value.schemeType = s;
+  isSchemeDropdownOpen.value = false;
+};
+
+const selectEditDistrict = (d) => {
+  editForm.value.district = d;
+  editForm.value.region = d;
+  isEditDistrictOpen.value = false;
+};
+
+const selectEditSchemeType = (s) => {
+  editForm.value.schemeType = s;
+  isEditSchemeOpen.value = false;
+};
+
+const handleClickOutside = (e) => {
+  if (districtDropdownRef.value && !districtDropdownRef.value.contains(e.target)) {
+    isDistrictDropdownOpen.value = false;
+  }
+  if (schemeDropdownRef.value && !schemeDropdownRef.value.contains(e.target)) {
+    isSchemeDropdownOpen.value = false;
+  }
+  if (editDistrictDropdownRef.value && !editDistrictDropdownRef.value.contains(e.target)) {
+    isEditDistrictOpen.value = false;
+  }
+  if (editSchemeDropdownRef.value && !editSchemeDropdownRef.value.contains(e.target)) {
+    isEditSchemeOpen.value = false;
+  }
+};
 
 // Edit Modal State
 const isEditModalOpen = ref(false);
@@ -940,6 +1226,43 @@ const getCoverImage = (visit) => {
 const getPhotoCount = (visit) => {
   return getVisitImages(visit).length;
 };
+
+// Summary Metrics Computed Properties
+const totalVisitsCount = computed(() => visits.value.length);
+
+const distinctDistrictsCount = computed(() => {
+  const set = new Set();
+  visits.value.forEach(v => {
+    const d = (v.district || v.region || '').trim();
+    if (d) set.add(d.toLowerCase());
+  });
+  return set.size;
+});
+
+const districtsReachedFormatted = computed(() => {
+  return `${distinctDistrictsCount.value} / 25`;
+});
+
+const thisMonthVisitsCount = computed(() => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  return visits.value.filter(v => {
+    const rawDate = v.createdAt || v.date || v.visitDate || v.created_at;
+    if (rawDate) {
+      const d = new Date(rawDate);
+      if (!isNaN(d.getTime())) {
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+      }
+    }
+    return true;
+  }).length;
+});
+
+const totalPhotoArchiveCount = computed(() => {
+  return visits.value.reduce((acc, v) => acc + getVisitImages(v).length, 0);
+});
 
 // High quality fallback SVG
 const getPlaceholderSvg = (title = 'Field Visit') => {
@@ -1046,24 +1369,23 @@ const removeEditImage = (index) => {
   }
 };
 
-// Filtering
+// Smart Search Filtering across multiple fields: title, district, schemeType, description
 const filteredVisits = computed(() => {
+  if (!searchQuery.value || !searchQuery.value.trim()) {
+    return visits.value;
+  }
+  const q = searchQuery.value.toLowerCase().trim();
   return visits.value.filter(visit => {
-    const vDistrict = (visit.district || visit.region || '').toLowerCase();
-    const matchesDistrict =
-      selectedDistrict.value === 'All' ||
-      vDistrict === selectedDistrict.value.toLowerCase();
+    const title = (visit.title || '').toLowerCase();
+    const district = (visit.district || visit.region || '').toLowerCase();
+    const scheme = (visit.schemeType || visit.scheme || '').toLowerCase();
+    const desc = (visit.description || visit.overview || '').toLowerCase();
 
-    if (!matchesDistrict) return false;
-
-    if (!searchQuery.value.trim()) return true;
-    const q = searchQuery.value.toLowerCase().trim();
     return (
-      (visit.title || '').toLowerCase().includes(q) ||
-      (visit.district || '').toLowerCase().includes(q) ||
-      (visit.region || '').toLowerCase().includes(q) ||
-      (visit.schemeType || '').toLowerCase().includes(q) ||
-      (visit.description || '').toLowerCase().includes(q)
+      title.includes(q) ||
+      district.includes(q) ||
+      scheme.includes(q) ||
+      desc.includes(q)
     );
   });
 });
@@ -1145,6 +1467,10 @@ const handleSave = async () => {
     errorMessage.value = 'Please select a district.';
     return;
   }
+  if (!form.value.schemeType) {
+    errorMessage.value = 'Please select a scheme type.';
+    return;
+  }
 
   saving.value = true;
   errorMessage.value = '';
@@ -1164,6 +1490,8 @@ const handleSave = async () => {
 
     await axios.post('/api/v1/field-visits', payload);
     showSuccess('Field visit record saved successfully!');
+    isDistrictDropdownOpen.value = false;
+    isSchemeDropdownOpen.value = false;
     form.value = {
       title: '',
       district: 'Kurunegala',
@@ -1198,12 +1526,16 @@ const openEditModal = (visit) => {
     images: currentImages
   };
   editCoverIndex.value = 0;
+  isEditDistrictOpen.value = false;
+  isEditSchemeOpen.value = false;
   isEditModalOpen.value = true;
 };
 
 const closeEditModal = () => {
   if (isUpdating.value) return;
   isEditModalOpen.value = false;
+  isEditDistrictOpen.value = false;
+  isEditSchemeOpen.value = false;
   editErrorMessage.value = '';
 };
 
@@ -1323,6 +1655,7 @@ const handleGlobalKeydown = (e) => {
 onMounted(() => {
   fetchVisits();
   window.addEventListener('keydown', handleGlobalKeydown);
+  document.addEventListener('click', handleClickOutside);
 });
 </script>
 
