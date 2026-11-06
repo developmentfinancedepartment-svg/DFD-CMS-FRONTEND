@@ -66,12 +66,12 @@
       </div>
 
       <!-- Alerts -->
-      <div v-if="successMessage" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between shadow-sm animate-in fade-in duration-200">
+      <div v-if="showSuccessAlert && successMessage" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold flex items-center justify-between shadow-sm animate-in fade-in duration-200">
         <div class="flex items-center gap-2.5">
           <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <span>{{ successMessage }}</span>
         </div>
-        <button @click="successMessage = ''" class="text-emerald-500 hover:text-emerald-700">
+        <button @click="dismissSuccessAlert" class="text-emerald-500 hover:text-emerald-700" title="Dismiss">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -121,25 +121,70 @@
               </div>
             </div>
 
-            <!-- Category Select -->
+            <!-- Category Custom Dropdown -->
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 Category <span class="text-rose-500">*</span>
               </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-folder text-xs"></i>
-                </div>
-                <select
-                  v-model="form.category"
-                  required
-                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800 font-semibold"
+              <div class="relative" ref="uploadCategoryDropdownRef">
+                <button
+                  type="button"
+                  @click="isUploadCategoryOpen = !isUploadCategoryOpen"
+                  class="w-full flex items-center justify-between rounded-2xl border border-slate-200 px-3.5 py-2.5 bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20': isUploadCategoryOpen }"
                 >
-                  <option value="" disabled>Select category</option>
-                  <option value="Workshops">Workshops</option>
-                  <option value="Field Visits">Field Visits</option>
-                  <option value="Institutional">Institutional</option>
-                </select>
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i :class="[getCategoryIcon(form.category), 'text-xs text-[#008795]']"></i>
+                    <span class="font-semibold text-slate-800 text-xs truncate">
+                      {{ form.category || 'Select category' }}
+                    </span>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180': isUploadCategoryOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Dropdown card -->
+                <div
+                  v-if="isUploadCategoryOpen"
+                  class="absolute left-0 right-0 top-full z-30 rounded-2xl shadow-xl border border-slate-100 bg-white overflow-hidden mt-1.5 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="bg-slate-50/70 border-b text-[11px] font-semibold text-slate-400 px-4 py-2.5">
+                    Select Category
+                  </div>
+                  <div class="p-1.5 space-y-1">
+                    <button
+                      v-for="cat in categories"
+                      :key="cat.value"
+                      type="button"
+                      @click="selectUploadCategory(cat.value)"
+                      class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-colors cursor-pointer text-left"
+                      :class="form.category === cat.value
+                        ? 'bg-[#008795]/10 text-[#008795] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5">
+                        <i :class="[cat.icon, 'text-xs', form.category === cat.value ? 'text-[#008795]' : 'text-slate-400']"></i>
+                        <span>{{ cat.label }}</span>
+                      </div>
+                      <svg
+                        v-if="form.category === cat.value"
+                        class="w-3.5 h-3.5 text-[#008795]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -231,10 +276,10 @@
         </div>
 
         <!-- 3. GALLERY CARDS LIST (7 cols) -->
-        <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 lg:p-7 shadow-sm space-y-5">
+        <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 lg:p-7 shadow-sm flex flex-col">
           
-          <!-- Filter & Search Bar -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-slate-100">
+          <!-- Filter & Search Bar (Static at top) -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100 shrink-0">
             <!-- Search -->
             <div class="relative flex-1 max-w-xs">
               <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -266,104 +311,107 @@
             </div>
           </div>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="py-16 text-center text-slate-500">
-            <svg class="animate-spin h-6 w-6 text-[#008795] mx-auto mb-2" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg>
-            <p class="text-xs font-bold text-slate-600">Loading gallery photos...</p>
-          </div>
-
-          <!-- Empty State -->
-          <div v-else-if="filteredItems.length === 0" class="py-16 text-center text-slate-400">
-            <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
-              <i class="fas fa-images text-2xl"></i>
+          <!-- Scrollable Gallery Content (Independently scrollable) -->
+          <div class="max-h-[620px] overflow-y-auto pr-2 pt-4 custom-scrollbar">
+            <!-- Loading State -->
+            <div v-if="loading" class="py-16 text-center text-slate-500">
+              <svg class="animate-spin h-6 w-6 text-[#008795] mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <p class="text-xs font-bold text-slate-600">Loading gallery photos...</p>
             </div>
-            <p class="text-sm font-bold text-slate-700">No gallery photos found</p>
-            <p class="text-xs text-slate-400 mt-1">Upload photos using the form on the left.</p>
-          </div>
 
-          <!-- Cards Grid -->
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div
-              v-for="item in filteredItems"
-              :key="item.id"
-              class="group bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-200/80 hover:border-cyan-500/50 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col"
-            >
-              <!-- Thumbnail -->
-              <div class="relative h-44 bg-slate-200 overflow-hidden">
-                <img
-                  v-if="item.imageUrl"
-                  :src="resolveImageUrl(item.imageUrl)"
-                  :alt="item.title"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  @error="onImageError"
-                />
-                <div v-else class="w-full h-full flex items-center justify-center text-slate-400 bg-slate-100">
-                  <i class="fas fa-image text-3xl"></i>
-                </div>
-
-                <!-- Category badge overlaid -->
-                <span
-                  :class="[
-                    'absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-md shadow-sm',
-                    categoryBadgeClass(item.category)
-                  ]"
-                >
-                  {{ item.category }}
-                </span>
-
-                <!-- Action buttons: Edit & Delete -->
-                <div class="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-                  <button
-                    type="button"
-                    @click.stop="openEditModal(item)"
-                    class="w-8 h-8 rounded-lg bg-white/95 hover:bg-[#008795] text-slate-600 hover:text-white transition-colors flex items-center justify-center"
-                    title="Edit Photo"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    @click.stop="openDeleteModal(item)"
-                    class="w-8 h-8 rounded-lg bg-white/95 hover:bg-rose-600 text-slate-600 hover:text-white transition-colors flex items-center justify-center"
-                    title="Delete Photo"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
+            <!-- Empty State -->
+            <div v-else-if="filteredItems.length === 0" class="py-16 text-center text-slate-400">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                <i class="fas fa-images text-2xl"></i>
               </div>
+              <p class="text-sm font-bold text-slate-700">No gallery photos found</p>
+              <p class="text-xs text-slate-400 mt-1">Upload photos using the form on the left.</p>
+            </div>
 
-              <!-- Info -->
-              <div class="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 class="text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-[#008795] transition-colors" :title="item.title">
-                    {{ item.title }}
-                  </h3>
-                  <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
-                    <i class="far fa-calendar-alt text-[#008795] text-[11px]"></i>
-                    <span>{{ item.eventDate || 'N/A' }}</span>
+            <!-- Cards Grid -->
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div
+                v-for="item in filteredItems"
+                :key="item.id"
+                class="group bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-200/80 hover:border-cyan-500/50 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col"
+              >
+                <!-- Thumbnail -->
+                <div class="relative h-44 bg-slate-200 overflow-hidden">
+                  <img
+                    v-if="item.imageUrl"
+                    :src="resolveImageUrl(item.imageUrl)"
+                    :alt="item.title"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    @error="onImageError"
+                  />
+                  <div v-else class="w-full h-full flex items-center justify-center text-slate-400 bg-slate-100">
+                    <i class="fas fa-image text-3xl"></i>
+                  </div>
+
+                  <!-- Category badge overlaid -->
+                  <span
+                    :class="[
+                      'absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-md shadow-sm',
+                      categoryBadgeClass(item.category)
+                    ]"
+                  >
+                    {{ item.category }}
+                  </span>
+
+                  <!-- Action buttons: Edit & Delete -->
+                  <div class="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+                    <button
+                      type="button"
+                      @click.stop="openEditModal(item)"
+                      class="w-8 h-8 rounded-lg bg-white/95 hover:bg-[#008795] text-slate-600 hover:text-white transition-colors flex items-center justify-center"
+                      title="Edit Photo"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+
+                    <button
+                      type="button"
+                      @click.stop="openDeleteModal(item)"
+                      class="w-8 h-8 rounded-lg bg-white/95 hover:bg-rose-600 text-slate-600 hover:text-white transition-colors flex items-center justify-center"
+                      title="Delete Photo"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
 
-                <!-- Footer details -->
-                <div class="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>ID: #{{ item.id }}</span>
-                  <a
-                    v-if="item.imageUrl"
-                    :href="resolveImageUrl(item.imageUrl)"
-                    target="_blank"
-                    class="text-[#008795] hover:underline font-semibold flex items-center gap-1"
-                  >
-                    <span>View full</span>
-                    <i class="fas fa-external-link-alt text-[9px]"></i>
-                  </a>
+                <!-- Info -->
+                <div class="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-800 line-clamp-1 group-hover:text-[#008795] transition-colors" :title="item.title">
+                      {{ item.title }}
+                    </h3>
+                    <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
+                      <i class="far fa-calendar-alt text-[#008795] text-[11px]"></i>
+                      <span>{{ item.eventDate || 'N/A' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Footer details -->
+                  <div class="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>ID: #{{ item.id }}</span>
+                    <a
+                      v-if="item.imageUrl"
+                      :href="resolveImageUrl(item.imageUrl)"
+                      target="_blank"
+                      class="text-[#008795] hover:underline font-semibold flex items-center gap-1"
+                    >
+                      <span>View full</span>
+                      <i class="fas fa-external-link-alt text-[9px]"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -375,7 +423,7 @@
 
       <!-- EDIT PHOTO MODAL -->
       <div
-        v-if="showEditModal"
+        v-if="isEditModalOpen"
         @click.self="!isUpdating && closeEditModal()"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
       >
@@ -440,24 +488,70 @@
               </div>
             </div>
 
-            <!-- Category -->
+            <!-- Category Custom Dropdown -->
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 Category <span class="text-rose-500">*</span>
               </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-folder text-xs"></i>
-                </div>
-                <select
-                  v-model="editForm.category"
-                  required
-                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800 font-semibold"
+              <div class="relative" ref="editCategoryDropdownRef">
+                <button
+                  type="button"
+                  @click="isEditCategoryOpen = !isEditCategoryOpen"
+                  class="w-full flex items-center justify-between rounded-2xl border border-slate-200 px-3.5 py-2.5 bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20': isEditCategoryOpen }"
                 >
-                  <option value="Workshops">Workshops</option>
-                  <option value="Field Visits">Field Visits</option>
-                  <option value="Institutional">Institutional</option>
-                </select>
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i :class="[getCategoryIcon(editForm.category), 'text-xs text-[#008795]']"></i>
+                    <span class="font-semibold text-slate-800 text-xs truncate">
+                      {{ editForm.category || 'Select category' }}
+                    </span>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180': isEditCategoryOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Dropdown card -->
+                <div
+                  v-if="isEditCategoryOpen"
+                  class="absolute left-0 right-0 top-full z-40 rounded-2xl shadow-xl border border-slate-100 bg-white overflow-hidden mt-1.5 animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="bg-slate-50/70 border-b text-[11px] font-semibold text-slate-400 px-4 py-2.5">
+                    Select Category
+                  </div>
+                  <div class="p-1.5 space-y-1">
+                    <button
+                      v-for="cat in categories"
+                      :key="cat.value"
+                      type="button"
+                      @click="selectEditCategory(cat.value)"
+                      class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-colors cursor-pointer text-left"
+                      :class="editForm.category === cat.value
+                        ? 'bg-[#008795]/10 text-[#008795] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5">
+                        <i :class="[cat.icon, 'text-xs', editForm.category === cat.value ? 'text-[#008795]' : 'text-slate-400']"></i>
+                        <span>{{ cat.label }}</span>
+                      </div>
+                      <svg
+                        v-if="editForm.category === cat.value"
+                        class="w-3.5 h-3.5 text-[#008795]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -621,7 +715,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from '../axiosInstance';
 
 // State
@@ -635,13 +729,90 @@ const selectedCategory = ref('All');
 const searchQuery = ref('');
 
 const successMessage = ref('');
+const showSuccessAlert = ref(false);
+let successTimeout = null;
+
+const showSuccess = (message) => {
+  if (successTimeout) {
+    clearTimeout(successTimeout);
+    successTimeout = null;
+  }
+  successMessage.value = message;
+  showSuccessAlert.value = true;
+  successTimeout = setTimeout(() => {
+    showSuccessAlert.value = false;
+    successMessage.value = '';
+    successTimeout = null;
+  }, 3500);
+};
+
+const dismissSuccessAlert = () => {
+  if (successTimeout) {
+    clearTimeout(successTimeout);
+    successTimeout = null;
+  }
+  showSuccessAlert.value = false;
+  successMessage.value = '';
+};
+
+onUnmounted(() => {
+  if (successTimeout) {
+    clearTimeout(successTimeout);
+    successTimeout = null;
+  }
+  document.removeEventListener('click', handleClickOutside);
+});
+
 const errorMessage = ref('');
+
+// Category metadata & custom dropdown state
+const categories = [
+  { label: 'Workshops', value: 'Workshops', icon: 'fas fa-chalkboard-teacher' },
+  { label: 'Field Visits', value: 'Field Visits', icon: 'fas fa-map-marked-alt' },
+  { label: 'Institutional', value: 'Institutional', icon: 'fas fa-landmark' }
+];
+
+const getCategoryIcon = (categoryValue) => {
+  const found = categories.find(c => c.value === categoryValue);
+  return found ? found.icon : 'fas fa-folder';
+};
+
+const isUploadCategoryOpen = ref(false);
+const isEditCategoryOpen = ref(false);
+const uploadCategoryDropdownRef = ref(null);
+const editCategoryDropdownRef = ref(null);
+
+const selectUploadCategory = (value) => {
+  form.value.category = value;
+  isUploadCategoryOpen.value = false;
+};
+
+const selectEditCategory = (value) => {
+  editForm.value.category = value;
+  isEditCategoryOpen.value = false;
+};
+
+const handleClickOutside = (event) => {
+  if (
+    uploadCategoryDropdownRef.value &&
+    !uploadCategoryDropdownRef.value.contains(event.target)
+  ) {
+    isUploadCategoryOpen.value = false;
+  }
+  if (
+    editCategoryDropdownRef.value &&
+    !editCategoryDropdownRef.value.contains(event.target)
+  ) {
+    isEditCategoryOpen.value = false;
+  }
+};
 
 const form = ref({
   title: '',
   category: 'Workshops',
   eventDate: new Date().toISOString().split('T')[0]
 });
+const uploadForm = form;
 
 const selectedFile = ref(null);
 const previewUrl = ref('');
@@ -650,7 +821,8 @@ const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
 
 // Edit State
-const showEditModal = ref(false);
+const isEditModalOpen = ref(false);
+const showEditModal = isEditModalOpen;
 const isUpdating = ref(false);
 const editErrorMessage = ref('');
 const editSelectedFile = ref(null);
@@ -770,7 +942,7 @@ const handleUpload = async () => {
 
   uploading.value = true;
   errorMessage.value = '';
-  successMessage.value = '';
+  dismissSuccessAlert();
 
   try {
     const formData = new FormData();
@@ -785,7 +957,7 @@ const handleUpload = async () => {
       }
     });
 
-    successMessage.value = 'Photograph uploaded to gallery successfully!';
+    showSuccess('Photograph uploaded to gallery successfully!');
     form.value.title = '';
     removeSelectedFile();
     await fetchGallery();
@@ -814,6 +986,7 @@ const formatDateForInput = (dateStr) => {
 
 const openEditModal = (item) => {
   editErrorMessage.value = '';
+  isEditCategoryOpen.value = false;
   editSelectedFile.value = null;
   if (editPreviewUrl.value) {
     URL.revokeObjectURL(editPreviewUrl.value);
@@ -827,12 +1000,13 @@ const openEditModal = (item) => {
     eventDate: formatDateForInput(item.eventDate),
     imageUrl: item.imageUrl || ''
   };
-  showEditModal.value = true;
+  isEditModalOpen.value = true;
 };
 
 const closeEditModal = () => {
   if (isUpdating.value) return;
-  showEditModal.value = false;
+  isEditModalOpen.value = false;
+  isEditCategoryOpen.value = false;
   editErrorMessage.value = '';
   if (editPreviewUrl.value) {
     URL.revokeObjectURL(editPreviewUrl.value);
@@ -906,7 +1080,8 @@ const handleUpdate = async () => {
       });
     }
 
-    successMessage.value = 'Gallery photo updated successfully!';
+    isEditModalOpen.value = false;
+    showSuccess('Gallery photo updated successfully!');
     closeEditModal();
     await fetchGallery();
   } catch (error) {
@@ -940,7 +1115,7 @@ const confirmDelete = async () => {
   try {
     await axios.delete(`/api/v1/gallery/${itemToDelete.value.id}`);
     galleryItems.value = galleryItems.value.filter(i => i.id !== itemToDelete.value.id);
-    successMessage.value = 'Photo deleted from gallery successfully.';
+    showSuccess('Photo deleted from gallery successfully.');
     showDeleteModal.value = false;
     itemToDelete.value = null;
     await fetchGallery();
@@ -952,5 +1127,32 @@ const confirmDelete = async () => {
   }
 };
 
-onMounted(fetchGallery);
+onMounted(() => {
+  fetchGallery();
+  document.addEventListener('click', handleClickOutside);
+});
 </script>
+
+<style scoped>
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+</style>
