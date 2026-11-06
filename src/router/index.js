@@ -20,6 +20,7 @@ import ManageNewsView from "@/views/ManageNewsView.vue"
 import AdminPublicationsView from "@/views/AdminPublicationsView.vue"
 import AdminGalleryView from "@/views/AdminGalleryView.vue"
 import AdminFieldVisitsView from "@/views/AdminFieldVisitsView.vue"
+import ManageTeamView from "@/views/ManageTeamView.vue"
 
 
 const router = createRouter({
@@ -166,6 +167,24 @@ const router = createRouter({
           },
         },
         {
+          path: "team",
+          name: "manage-team",
+          component: ManageTeamView,
+          meta: {
+            title: "Our Team Management",
+            requiresAuth: true,
+          },
+        },
+        {
+          path: "manage-team",
+          name: "manage-team-alt",
+          component: ManageTeamView,
+          meta: {
+            title: "Our Team Management",
+            requiresAuth: true,
+          },
+        },
+        {
           path: "news",
           name: "news-home",
           component: ManageNewsView,
@@ -255,6 +274,24 @@ const router = createRouter({
           component: AdminFieldVisitsView,
           meta: {
             title: "Field Visits Management",
+            requiresAuth: true,
+          },
+        },
+      ],
+    },
+    {
+      path: "/admin/team",
+      component: HomePage,
+      meta: {
+        requiresAuth: true,
+      },
+      children: [
+        {
+          path: "",
+          name: "admin-team-direct",
+          component: ManageTeamView,
+          meta: {
+            title: "Our Team Management",
             requiresAuth: true,
           },
         },

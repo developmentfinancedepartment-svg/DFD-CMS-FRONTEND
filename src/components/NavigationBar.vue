@@ -35,11 +35,13 @@
                 <router-link to="/admin/gallery" class="dropdown-link">Gallery</router-link>
                 <router-link :to="{ name: 'event-home' }" class="dropdown-link">Events</router-link>
                 <router-link to="/admin/field-visits" class="dropdown-link">Field Visits</router-link>
+                <router-link to="/admin/team" class="dropdown-link">Our Team</router-link>
               </div>
             </div>
           </div>
 
           <router-link :to="{ name: 'category-staff' }" class="nav-link">Staff</router-link>
+          <router-link :to="{ name: 'manage-team' }" class="nav-link">Our Team</router-link>
           <router-link :to="{ name: 'news-home' }" class="nav-link">News</router-link>
           <router-link :to="{ name: 'manage-schemes' }" class="nav-link">Schemes</router-link>
 
