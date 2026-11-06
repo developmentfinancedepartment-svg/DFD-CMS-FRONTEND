@@ -314,16 +314,30 @@
                   {{ item.category }}
                 </span>
 
-                <!-- Delete button on hover -->
-                <button
-                  @click="openDeleteModal(item)"
-                  class="absolute top-3 right-3 p-2 rounded-xl bg-black/60 hover:bg-rose-600 text-white backdrop-blur-md transition-all shadow-sm opacity-90 hover:opacity-100"
-                  title="Delete Photo"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                <!-- Action buttons: Edit & Delete -->
+                <div class="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+                  <button
+                    type="button"
+                    @click.stop="openEditModal(item)"
+                    class="w-8 h-8 rounded-lg bg-white/95 hover:bg-[#008795] text-slate-600 hover:text-white transition-colors flex items-center justify-center"
+                    title="Edit Photo"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    @click.stop="openDeleteModal(item)"
+                    class="w-8 h-8 rounded-lg bg-white/95 hover:bg-rose-600 text-slate-600 hover:text-white transition-colors flex items-center justify-center"
+                    title="Delete Photo"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Info -->
@@ -357,6 +371,187 @@
 
         </div>
 
+      </div>
+
+      <!-- EDIT PHOTO MODAL -->
+      <div
+        v-if="showEditModal"
+        @click.self="!isUpdating && closeEditModal()"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
+      >
+        <div class="relative w-full max-w-lg rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-slate-100 my-8 transform transition-all animate-in fade-in zoom-in-95 duration-150">
+          <!-- Header -->
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-[#008795]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-slate-800">Edit Gallery Photo</h3>
+                <p class="text-xs text-slate-400">Update photo title, category, and date</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              :disabled="isUpdating"
+              @click="closeEditModal"
+              class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition-colors disabled:opacity-50"
+              title="Close"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Error Alert inside modal -->
+          <div v-if="editErrorMessage" class="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>{{ editErrorMessage }}</span>
+            </div>
+            <button type="button" @click="editErrorMessage = ''" class="text-rose-500 hover:text-rose-700">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          <!-- Form -->
+          <form @submit.prevent="handleUpdate" class="space-y-4">
+            <!-- Title -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Photo / Event Title <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i class="fas fa-heading text-xs"></i>
+                </div>
+                <input
+                  v-model="editForm.title"
+                  type="text"
+                  required
+                  placeholder="e.g. MSME Policy Workshop 2026"
+                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                />
+              </div>
+            </div>
+
+            <!-- Category -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Category <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i class="fas fa-folder text-xs"></i>
+                </div>
+                <select
+                  v-model="editForm.category"
+                  required
+                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800 font-semibold"
+                >
+                  <option value="Workshops">Workshops</option>
+                  <option value="Field Visits">Field Visits</option>
+                  <option value="Institutional">Institutional</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Event Date -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Event Date <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i class="fas fa-calendar-alt text-xs"></i>
+                </div>
+                <input
+                  v-model="editForm.eventDate"
+                  type="date"
+                  required
+                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                />
+              </div>
+            </div>
+
+            <!-- Current Image Preview / Optional Replacement Image -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Photograph (Optional Replacement)
+              </label>
+              <div class="flex items-center gap-3.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-200">
+                  <img
+                    v-if="editPreviewUrl || editForm.imageUrl"
+                    :src="editPreviewUrl || resolveImageUrl(editForm.imageUrl)"
+                    class="w-full h-full object-cover"
+                    alt="Current photo"
+                  />
+                  <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
+                    <i class="fas fa-image text-lg"></i>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-bold text-slate-700 truncate">
+                    {{ editSelectedFile ? editSelectedFile.name : 'Current Image' }}
+                  </p>
+                  <p class="text-[11px] text-slate-400">
+                    {{ editSelectedFile ? 'New photo will replace current' : 'Leave empty to keep existing photograph' }}
+                  </p>
+                  <div class="mt-2 flex items-center gap-2">
+                    <label class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-700 hover:border-[#008795] hover:text-[#008795] cursor-pointer transition shadow-xs">
+                      <i class="fas fa-camera text-[10px]"></i>
+                      <span>{{ editSelectedFile ? 'Change photo' : 'Upload new photo' }}</span>
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg, image/webp"
+                        @change="handleEditFileChange"
+                        class="hidden"
+                      />
+                    </label>
+                    <button
+                      v-if="editSelectedFile"
+                      type="button"
+                      @click="removeEditSelectedFile"
+                      class="text-[11px] text-rose-500 hover:text-rose-700 font-semibold transition"
+                    >
+                      Revert
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                :disabled="isUpdating"
+                @click="closeEditModal"
+                class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="isUpdating"
+                class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#008795] to-[#006071] hover:from-[#009fb0] hover:to-[#007c91] text-white text-sm font-bold shadow-md shadow-cyan-900/15 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              >
+                <svg v-if="isUpdating" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <i v-else class="fas fa-check"></i>
+                <span>{{ isUpdating ? 'Saving Changes...' : 'Save Changes' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- DELETE CONFIRMATION MODAL -->
@@ -453,6 +648,21 @@ const previewUrl = ref('');
 
 const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
+
+// Edit State
+const showEditModal = ref(false);
+const isUpdating = ref(false);
+const editErrorMessage = ref('');
+const editSelectedFile = ref(null);
+const editPreviewUrl = ref('');
+
+const editForm = ref({
+  id: null,
+  title: '',
+  category: 'Workshops',
+  eventDate: '',
+  imageUrl: ''
+});
 
 // Category badge classes
 const categoryBadgeClass = (category) => {
@@ -587,6 +797,129 @@ const handleUpload = async () => {
   }
 };
 
+// Edit Handlers
+const formatDateForInput = (dateStr) => {
+  if (!dateStr) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  try {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().split('T')[0];
+    }
+  } catch (e) {
+    // fallback
+  }
+  return dateStr;
+};
+
+const openEditModal = (item) => {
+  editErrorMessage.value = '';
+  editSelectedFile.value = null;
+  if (editPreviewUrl.value) {
+    URL.revokeObjectURL(editPreviewUrl.value);
+    editPreviewUrl.value = '';
+  }
+
+  editForm.value = {
+    id: item.id,
+    title: item.title || '',
+    category: item.category || 'Workshops',
+    eventDate: formatDateForInput(item.eventDate),
+    imageUrl: item.imageUrl || ''
+  };
+  showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+  if (isUpdating.value) return;
+  showEditModal.value = false;
+  editErrorMessage.value = '';
+  if (editPreviewUrl.value) {
+    URL.revokeObjectURL(editPreviewUrl.value);
+    editPreviewUrl.value = '';
+  }
+  editSelectedFile.value = null;
+  editForm.value = {
+    id: null,
+    title: '',
+    category: 'Workshops',
+    eventDate: '',
+    imageUrl: ''
+  };
+};
+
+const handleEditFileChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    editSelectedFile.value = file;
+    if (editPreviewUrl.value) {
+      URL.revokeObjectURL(editPreviewUrl.value);
+    }
+    editPreviewUrl.value = URL.createObjectURL(file);
+  }
+};
+
+const removeEditSelectedFile = () => {
+  editSelectedFile.value = null;
+  if (editPreviewUrl.value) {
+    URL.revokeObjectURL(editPreviewUrl.value);
+    editPreviewUrl.value = '';
+  }
+};
+
+const handleUpdate = async () => {
+  if (!editForm.value.title?.trim()) {
+    editErrorMessage.value = 'Please provide a photo title.';
+    return;
+  }
+  if (!editForm.value.category) {
+    editErrorMessage.value = 'Please select a category.';
+    return;
+  }
+  if (!editForm.value.eventDate) {
+    editErrorMessage.value = 'Please select an event date.';
+    return;
+  }
+
+  isUpdating.value = true;
+  editErrorMessage.value = '';
+  errorMessage.value = '';
+
+  try {
+    if (editSelectedFile.value) {
+      const formData = new FormData();
+      formData.append('title', editForm.value.title.trim());
+      formData.append('category', editForm.value.category);
+      formData.append('eventDate', editForm.value.eventDate);
+      formData.append('image', editSelectedFile.value);
+
+      await axios.put(`/api/v1/gallery/${editForm.value.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    } else {
+      await axios.put(`/api/v1/gallery/${editForm.value.id}`, {
+        title: editForm.value.title.trim(),
+        category: editForm.value.category,
+        eventDate: editForm.value.eventDate
+      });
+    }
+
+    successMessage.value = 'Gallery photo updated successfully!';
+    closeEditModal();
+    await fetchGallery();
+  } catch (error) {
+    console.error('Failed to update gallery photo:', error);
+    editErrorMessage.value =
+      error.response?.data?.message ||
+      (typeof error.response?.data === 'string' ? error.response.data : null) ||
+      'Failed to update photo. Please check your connection and try again.';
+  } finally {
+    isUpdating.value = false;
+  }
+};
+
 // Delete Handlers
 const openDeleteModal = (item) => {
   itemToDelete.value = item;
@@ -610,6 +943,7 @@ const confirmDelete = async () => {
     successMessage.value = 'Photo deleted from gallery successfully.';
     showDeleteModal.value = false;
     itemToDelete.value = null;
+    await fetchGallery();
   } catch (error) {
     console.error('Failed to delete gallery item:', error);
     errorMessage.value = 'Failed to delete gallery item.';
