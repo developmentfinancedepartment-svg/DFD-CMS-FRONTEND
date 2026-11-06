@@ -193,17 +193,20 @@
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 Event Date <span class="text-rose-500">*</span>
               </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-calendar-alt text-xs"></i>
-                </div>
-                <input
-                  v-model="form.eventDate"
-                  type="date"
-                  required
-                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-                />
-              </div>
+              <VueDatePicker
+                v-model="uploadForm.eventDate"
+                model-type="yyyy-MM-dd"
+                format="yyyy-MM-dd"
+                :enable-time-picker="false"
+                auto-apply
+                :close-on-auto-apply="true"
+                placeholder="Select Event Date"
+                :teleport="true"
+              >
+                <template #input-icon>
+                  <i class="fas fa-calendar-alt text-[#008795] text-xs pl-3.5"></i>
+                </template>
+              </VueDatePicker>
             </div>
 
             <!-- Image File Input -->
@@ -560,17 +563,20 @@
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 Event Date <span class="text-rose-500">*</span>
               </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-calendar-alt text-xs"></i>
-                </div>
-                <input
-                  v-model="editForm.eventDate"
-                  type="date"
-                  required
-                  class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-                />
-              </div>
+              <VueDatePicker
+                v-model="editForm.eventDate"
+                model-type="yyyy-MM-dd"
+                format="yyyy-MM-dd"
+                :enable-time-picker="false"
+                auto-apply
+                :close-on-auto-apply="true"
+                placeholder="Select Event Date"
+                :teleport="true"
+              >
+                <template #input-icon>
+                  <i class="fas fa-calendar-alt text-[#008795] text-xs pl-3.5"></i>
+                </template>
+              </VueDatePicker>
             </div>
 
             <!-- Current Image Preview / Optional Replacement Image -->
@@ -717,6 +723,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from '../axiosInstance';
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 // State
 const galleryItems = ref([]);
@@ -1154,5 +1162,183 @@ onMounted(() => {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #94a3b8;
+}
+</style>
+
+<style>
+/* Modern Elegant VueDatePicker Styling matching Portal UI */
+:root {
+  --dp-primary-color: #008795;
+  --dp-primary-text-color: #ffffff;
+  --dp-border-radius: 16px;
+  --dp-cell-border-radius: 10px;
+  --dp-hover-color: rgba(0, 135, 149, 0.08);
+  --dp-hover-text-color: #008795;
+  --dp-hover-icon-color: #008795;
+  --dp-border-color: #e2e8f0;
+  --dp-menu-border-color: #f1f5f9;
+  --dp-font-family: inherit;
+}
+
+.dp--theme-light,
+.dp__theme_light {
+  --dp-primary-color: #008795;
+  --dp-primary-text-color: #ffffff;
+  --dp-border-radius: 16px;
+  --dp-cell-border-radius: 10px;
+  --dp-hover-color: rgba(0, 135, 149, 0.08);
+  --dp-hover-text-color: #008795;
+  --dp-hover-icon-color: #008795;
+  --dp-border-color: #e2e8f0;
+  --dp-menu-border-color: #f1f5f9;
+  --dp-highlight-color: rgba(0, 135, 149, 0.1);
+}
+
+/* Rounded-2xl pill input */
+.dp--input,
+.dp__input {
+  border-radius: 1rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: #1e293b !important;
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  padding-left: 2.6rem !important;
+  padding-right: 1rem !important;
+  height: 42px !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dp--input:hover,
+.dp__input:hover {
+  border-color: #008795 !important;
+}
+
+.dp--input:focus,
+.dp--input-focus,
+.dp__input:focus,
+.dp__input_focus {
+  background-color: #ffffff !important;
+  border-color: #008795 !important;
+  box-shadow: 0 0 0 2px rgba(0, 135, 149, 0.2) !important;
+  outline: none !important;
+}
+
+/* Left Icon */
+.dp--input-icon,
+.dp__input_icon {
+  left: 0 !important;
+  padding-left: 0.9rem !important;
+  color: #008795 !important;
+}
+
+/* Popover Menu with Smooth Shadow & Rounded Corners */
+.dp--menu,
+.dp__menu {
+  border-radius: 1.25rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #f1f5f9 !important;
+  background-color: #ffffff !important;
+  padding: 10px !important;
+  font-family: inherit !important;
+}
+
+/* Calendar Header */
+.dp--calendar-header,
+.dp__calendar_header {
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.dp--calendar-header-cell,
+.dp__calendar_header_cell {
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding-bottom: 8px !important;
+}
+
+/* Month and Year Navigation */
+.dp--month-year-row,
+.dp__month_year_row {
+  margin-bottom: 6px !important;
+}
+
+.dp--month-year-select,
+.dp__month_year_select {
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  border-radius: 10px !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.dp--month-year-select:hover,
+.dp__month_year_select:hover {
+  background-color: rgba(0, 135, 149, 0.08) !important;
+  color: #008795 !important;
+}
+
+.dp--inner-nav,
+.dp__inner_nav {
+  border-radius: 10px !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.dp--inner-nav:hover,
+.dp__inner_nav:hover {
+  background-color: rgba(0, 135, 149, 0.08) !important;
+  color: #008795 !important;
+}
+
+/* Rounded Calendar Grid Cells */
+.dp--cell-inner,
+.dp__cell_inner {
+  border-radius: 10px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.dp--cell-inner:hover,
+.dp__cell_inner:hover {
+  background-color: rgba(0, 135, 149, 0.1) !important;
+  color: #008795 !important;
+}
+
+/* Primary Active / Selected Date */
+.dp--active,
+.dp__active_date {
+  background: #008795 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(0, 135, 149, 0.35) !important;
+}
+
+/* Today Cell Indicator */
+.dp--today,
+.dp__today {
+  border: 1.5px solid #008795 !important;
+}
+
+/* Overlay month/year picker grid cells */
+.dp--overlay-cell-active {
+  background: #008795 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+}
+
+.dp--overlay-cell {
+  border-radius: 10px !important;
+  font-size: 0.8125rem !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.dp--overlay-cell:hover {
+  background-color: rgba(0, 135, 149, 0.08) !important;
+  color: #008795 !important;
 }
 </style>
