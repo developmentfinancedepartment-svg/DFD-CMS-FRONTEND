@@ -669,46 +669,244 @@
           </div>
 
           <!-- 5. DETAILED SPECIFICATIONS (SHARED) -->
-          <div class="bg-slate-50/70 rounded-2xl p-4 border border-slate-200/80 space-y-4">
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-slate-400"></span>
-              Guidelines &amp; Program Specifications
-            </h3>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Target Beneficiaries
-              </label>
-              <input
-                v-model="form.beneficiaries"
-                type="text"
-                placeholder="e.g. Registered MSMEs, Farmers, Women Entrepreneurs, Small Rice Millers"
-                class="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-              />
+          <div class="bg-slate-50/70 rounded-2xl p-4 border border-slate-200/80 space-y-5">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                Guidelines &amp; Program Specifications
+              </h3>
+              <span class="text-[11px] text-slate-400 font-medium">Multiple points render as verified bullet lists on public portal</span>
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Program Purpose &amp; Objectives
-              </label>
-              <textarea
-                v-model="form.purpose"
-                rows="3"
-                placeholder="Describe the scheme's main purpose and policy objectives..."
-                class="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-              ></textarea>
+            <!-- 1. Target Beneficiaries -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Target Beneficiaries
+                  <span class="text-slate-400 font-normal ml-1">
+                    ({{ isBeneficiariesListMode ? `${beneficiariesPoints.filter(p => p.trim()).length} criteria` : 'Multi-line text' }})
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  @click="toggleFieldMode('beneficiaries')"
+                  class="text-[11px] font-semibold text-[#008795] hover:text-[#006071] transition flex items-center gap-1"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  {{ isBeneficiariesListMode ? 'Switch to Multi-line Text' : 'Switch to Points Builder' }}
+                </button>
+              </div>
+
+              <!-- List Builder Mode -->
+              <div v-if="isBeneficiariesListMode" class="space-y-2">
+                <div
+                  v-for="(point, idx) in beneficiariesPoints"
+                  :key="idx"
+                  class="flex items-center gap-2"
+                >
+                  <span class="w-6 h-6 rounded-full bg-cyan-50 border border-cyan-200 text-[#008795] text-xs font-bold flex items-center justify-center shrink-0">
+                    {{ idx + 1 }}
+                  </span>
+                  <input
+                    v-model="beneficiariesPoints[idx]"
+                    @paste="handlePointPaste($event, beneficiariesPoints, idx)"
+                    type="text"
+                    placeholder="e.g. Registered MSMEs, Farmers, Women Entrepreneurs, Small Rice Millers"
+                    class="flex-1 px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                  />
+                  <button
+                    v-if="beneficiariesPoints.length > 1"
+                    @click="removePoint(beneficiariesPoints, idx)"
+                    type="button"
+                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                    title="Remove criterion"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    @click="addPoint(beneficiariesPoints)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#008795] hover:text-[#006071] bg-cyan-50/80 hover:bg-cyan-100 rounded-xl border border-cyan-200/70 transition"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    + Add Beneficiary Point
+                  </button>
+                  <span class="text-[11px] text-slate-400">Paste multiple lines to automatically split points</span>
+                </div>
+              </div>
+
+              <!-- Multi-line Textarea Mode -->
+              <div v-else>
+                <textarea
+                  v-model="form.beneficiaries"
+                  rows="3"
+                  placeholder="Enter target beneficiaries (each line renders as a verified bullet point on the public portal)..."
+                  class="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                ></textarea>
+                <p class="text-[11px] text-slate-400 mt-1">Each line renders as a bullet item on the public portal.</p>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Eligibility &amp; Document Requirements
-              </label>
-              <textarea
-                v-model="form.eligibility"
-                rows="3"
-                placeholder="List eligibility criteria and documentation requirements (each line renders as a verified requirement on public portal)..."
-                class="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
-              ></textarea>
+            <!-- 2. Program Purpose & Objectives -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Scheme Purpose &amp; Objectives
+                  <span class="text-slate-400 font-normal ml-1">
+                    ({{ isPurposeListMode ? `${purposePoints.filter(p => p.trim()).length} objectives` : 'Multi-line text' }})
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  @click="toggleFieldMode('purpose')"
+                  class="text-[11px] font-semibold text-[#008795] hover:text-[#006071] transition flex items-center gap-1"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  {{ isPurposeListMode ? 'Switch to Multi-line Text' : 'Switch to Points Builder' }}
+                </button>
+              </div>
+
+              <!-- List Builder Mode -->
+              <div v-if="isPurposeListMode" class="space-y-2">
+                <div
+                  v-for="(point, idx) in purposePoints"
+                  :key="idx"
+                  class="flex items-center gap-2"
+                >
+                  <span class="w-6 h-6 rounded-full bg-cyan-50 border border-cyan-200 text-[#008795] text-xs font-bold flex items-center justify-center shrink-0">
+                    {{ idx + 1 }}
+                  </span>
+                  <input
+                    v-model="purposePoints[idx]"
+                    @paste="handlePointPaste($event, purposePoints, idx)"
+                    type="text"
+                    placeholder="e.g. Provide working capital facilities to revitalize MSMEs..."
+                    class="flex-1 px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                  />
+                  <button
+                    v-if="purposePoints.length > 1"
+                    @click="removePoint(purposePoints, idx)"
+                    type="button"
+                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                    title="Remove objective"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    @click="addPoint(purposePoints)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#008795] hover:text-[#006071] bg-cyan-50/80 hover:bg-cyan-100 rounded-xl border border-cyan-200/70 transition"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    + Add Objective
+                  </button>
+                  <span class="text-[11px] text-slate-400">Paste multiple lines to automatically split points</span>
+                </div>
+              </div>
+
+              <!-- Multi-line Textarea Mode -->
+              <div v-else>
+                <textarea
+                  v-model="form.purpose"
+                  rows="3"
+                  placeholder="Describe the scheme's main purpose and policy objectives (each line renders as a verified point on public portal)..."
+                  class="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                ></textarea>
+                <p class="text-[11px] text-slate-400 mt-1">Each line renders as a bullet item on the public portal.</p>
+              </div>
+            </div>
+
+            <!-- 3. Eligibility & Document Requirements -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Eligibility &amp; Document Requirements
+                  <span class="text-slate-400 font-normal ml-1">
+                    ({{ isRequirementsListMode ? `${requirementsPoints.filter(p => p.trim()).length} requirements` : 'Multi-line text' }})
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  @click="toggleFieldMode('requirements')"
+                  class="text-[11px] font-semibold text-[#008795] hover:text-[#006071] transition flex items-center gap-1"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  {{ isRequirementsListMode ? 'Switch to Multi-line Text' : 'Switch to Points Builder' }}
+                </button>
+              </div>
+
+              <!-- List Builder Mode -->
+              <div v-if="isRequirementsListMode" class="space-y-2">
+                <div
+                  v-for="(point, idx) in requirementsPoints"
+                  :key="idx"
+                  class="flex items-center gap-2"
+                >
+                  <span class="w-6 h-6 rounded-full bg-cyan-50 border border-cyan-200 text-[#008795] text-xs font-bold flex items-center justify-center shrink-0">
+                    {{ idx + 1 }}
+                  </span>
+                  <input
+                    v-model="requirementsPoints[idx]"
+                    @paste="handlePointPaste($event, requirementsPoints, idx)"
+                    type="text"
+                    placeholder="e.g. Valid Business Registration (BR) copy..."
+                    class="flex-1 px-3.5 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                  />
+                  <button
+                    v-if="requirementsPoints.length > 1"
+                    @click="removePoint(requirementsPoints, idx)"
+                    type="button"
+                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                    title="Remove requirement"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    @click="addPoint(requirementsPoints)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#008795] hover:text-[#006071] bg-cyan-50/80 hover:bg-cyan-100 rounded-xl border border-cyan-200/70 transition"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                    + Add Requirement
+                  </button>
+                  <span class="text-[11px] text-slate-400">Paste multiple lines to automatically split points</span>
+                </div>
+              </div>
+
+              <!-- Multi-line Textarea Mode -->
+              <div v-else>
+                <textarea
+                  v-model="form.eligibility"
+                  rows="3"
+                  placeholder="List eligibility criteria and documentation requirements (each line renders as a verified requirement on public portal)..."
+                  class="w-full px-4 py-2.5 text-sm bg-white border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
+                ></textarea>
+                <p class="text-[11px] text-slate-400 mt-1">Each line renders as a verified requirement on public portal.</p>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1067,16 +1265,135 @@ const formatArrayField = (raw) => {
 };
 
 // Modal Actions
+// Dynamic Multi-Point Builder States
+const beneficiariesPoints = ref(['']);
+const purposePoints = ref(['']);
+const requirementsPoints = ref(['']);
+
+const isBeneficiariesListMode = ref(true);
+const isPurposeListMode = ref(true);
+const isRequirementsListMode = ref(true);
+
+const parseRawToList = (raw, allowComma = false) => {
+  if (!raw || typeof raw !== 'string' || !raw.trim()) return [''];
+  const trimmed = raw.trim();
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(s => String(s).trim()).filter(Boolean);
+      }
+    } catch {}
+  }
+  if (trimmed.includes('\n') || trimmed.includes('\r')) {
+    const lines = trimmed
+      .split(/\r?\n+/)
+      .map(l => l.trim().replace(/^[-•*?✓✔\u2022\u25E6\u25AA\u25CF]\s*/, '').replace(/^\d+[\.\)]\s*/, ''))
+      .filter(Boolean);
+    if (lines.length > 0) return lines;
+  }
+  if (/[\u2022\u25CF\u25E6•]/.test(trimmed)) {
+    const parts = trimmed
+      .split(/[\u2022\u25CF\u25E6•]/)
+      .map(p => p.trim().replace(/^[-*?✓✔]\s*/, ''))
+      .filter(Boolean);
+    if (parts.length > 1) return parts;
+  }
+  if (trimmed.includes(';')) {
+    const parts = trimmed.split(';').map(p => p.trim()).filter(Boolean);
+    if (parts.length > 1) return parts;
+  }
+  if (allowComma && trimmed.includes(',')) {
+    const strippedDot = trimmed.replace(/\.\s*$/, '');
+    if (!strippedDot.includes('.') && strippedDot.length < 240) {
+      const parts = strippedDot.split(',').map(p => p.trim().replace(/^and\s+/i, '')).filter(Boolean);
+      if (parts.length > 1) return parts;
+    }
+  }
+  return [trimmed.replace(/^[-•*?✓✔\u2022\u25E6\u25AA\u25CF]\s*/, '')];
+};
+
+const listToRaw = (list) => {
+  if (!Array.isArray(list)) return '';
+  return list.map(s => (s || '').trim()).filter(Boolean).join('\n');
+};
+
+const addPoint = (targetList) => {
+  targetList.push('');
+};
+
+const removePoint = (targetList, index) => {
+  if (targetList.length > 1) {
+    targetList.splice(index, 1);
+  } else {
+    targetList[0] = '';
+  }
+};
+
+const handlePointPaste = (event, targetList, currentIndex) => {
+  const pasteText = (event.clipboardData || window.clipboardData)?.getData('text') || '';
+  if (pasteText.includes('\n') || /[\u2022\u25CF\u25E6•;]/.test(pasteText)) {
+    event.preventDefault();
+    const parsed = parseRawToList(pasteText);
+    if (parsed.length > 0) {
+      targetList.splice(currentIndex, 1, ...parsed);
+    }
+  }
+};
+
+const toggleFieldMode = (field) => {
+  if (field === 'beneficiaries') {
+    isBeneficiariesListMode.value = !isBeneficiariesListMode.value;
+    if (isBeneficiariesListMode.value) {
+      beneficiariesPoints.value = parseRawToList(form.value.beneficiaries);
+    } else {
+      form.value.beneficiaries = listToRaw(beneficiariesPoints.value);
+    }
+  } else if (field === 'purpose') {
+    isPurposeListMode.value = !isPurposeListMode.value;
+    if (isPurposeListMode.value) {
+      purposePoints.value = parseRawToList(form.value.purpose);
+    } else {
+      form.value.purpose = listToRaw(purposePoints.value);
+    }
+  } else if (field === 'requirements') {
+    isRequirementsListMode.value = !isRequirementsListMode.value;
+    if (isRequirementsListMode.value) {
+      requirementsPoints.value = parseRawToList(form.value.eligibility || form.value.requirements);
+    } else {
+      form.value.eligibility = listToRaw(requirementsPoints.value);
+      form.value.requirements = form.value.eligibility;
+    }
+  }
+};
+
 const openAddModal = () => {
   isEdit.value = false;
   editingId.value = null;
   form.value = defaultForm();
+  beneficiariesPoints.value = [''];
+  purposePoints.value = [''];
+  requirementsPoints.value = [''];
+  isBeneficiariesListMode.value = true;
+  isPurposeListMode.value = true;
+  isRequirementsListMode.value = true;
   showModal.value = true;
 };
 
 const openEditModal = (scheme) => {
   isEdit.value = true;
   editingId.value = scheme.id;
+  const rawBeneficiaries = scheme.beneficiaries || '';
+  const rawPurpose = scheme.purpose || '';
+  const rawRequirements = scheme.eligibility || scheme.requirements || '';
+
+  beneficiariesPoints.value = parseRawToList(rawBeneficiaries, true);
+  purposePoints.value = parseRawToList(rawPurpose, false);
+  requirementsPoints.value = parseRawToList(rawRequirements, false);
+  isBeneficiariesListMode.value = true;
+  isPurposeListMode.value = true;
+  isRequirementsListMode.value = true;
+
   form.value = {
     schemeType: scheme.schemeType || 'LOAN',
     title: scheme.title || '',
@@ -1087,15 +1404,15 @@ const openEditModal = (scheme) => {
     natureOfLoan: scheme.natureOfLoan || '',
     repaymentPeriod: scheme.repaymentPeriod || '',
     gracePeriod: scheme.gracePeriod || '',
-    beneficiaries: scheme.beneficiaries || '',
-    requirements: scheme.requirements || '',
+    beneficiaries: rawBeneficiaries,
+    requirements: rawRequirements,
     locations: formatArrayField(scheme.locations),
     servicesProvided: formatArrayField(scheme.servicesProvided),
     implementationArrangements: scheme.implementationArrangements || '',
     otherInitiatives: scheme.otherInitiatives || '',
     contactInfo: scheme.contactInfo || '',
-    purpose: scheme.purpose || '',
-    eligibility: scheme.eligibility || '',
+    purpose: rawPurpose,
+    eligibility: rawRequirements,
     participatingBanks: scheme.participatingBanks || '',
     description: scheme.description || '',
     icon: scheme.icon || (scheme.schemeType === 'SERVICE' ? 'fas fa-warehouse' : 'fas fa-hand-holding-usd'),
@@ -1110,6 +1427,25 @@ const closeModal = () => {
 
 const saveScheme = async () => {
   try {
+    // Synchronize dynamic list builders to form properties
+    if (isBeneficiariesListMode.value) {
+      form.value.beneficiaries = listToRaw(beneficiariesPoints.value);
+    }
+    if (isPurposeListMode.value) {
+      form.value.purpose = listToRaw(purposePoints.value);
+    }
+    if (isRequirementsListMode.value) {
+      form.value.eligibility = listToRaw(requirementsPoints.value);
+      form.value.requirements = form.value.eligibility;
+    } else {
+      if (!form.value.requirements && form.value.eligibility) {
+        form.value.requirements = form.value.eligibility;
+      }
+      if (!form.value.eligibility && form.value.requirements) {
+        form.value.eligibility = form.value.requirements;
+      }
+    }
+
     const payload = { ...form.value };
 
     // Format locations as JSON array string
