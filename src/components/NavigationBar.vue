@@ -20,27 +20,8 @@
         <!-- NAVIGATION LINKS -->
         <div class="hidden lg:flex items-center gap-1.5">
           <router-link :to="{ name: 'view-home' }" class="nav-link">Overview</router-link>
-          
-          <div class="relative group">
-            <button 
-              class="nav-link flex items-center gap-1.5 focus:outline-none"
-              :class="{ 'router-link-active': isDocumentsActive }"
-            >
-              {{ documentsDropdownLabel }}
-              <svg class="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            <div class="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
-              <div class="w-64 bg-[#003842] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-cyan-500/30 py-2.5 overflow-hidden">
-                <router-link :to="{ name: 'admin-publications' }" class="dropdown-link">Action Plans</router-link>
-                <router-link to="/admin/gallery" class="dropdown-link">Gallery</router-link>
-                <router-link :to="{ name: 'event-home' }" class="dropdown-link">Events</router-link>
-                <router-link to="/admin/field-visits" class="dropdown-link">Field Visits</router-link>
-                <router-link to="/admin/team" class="dropdown-link">Our Team</router-link>
-              </div>
-            </div>
-          </div>
-
-          <router-link :to="{ name: 'category-staff' }" class="nav-link">Staff</router-link>
+          <router-link :to="{ name: 'admin-publications' }" class="nav-link">Publications</router-link>
+          <router-link to="/admin/gallery" class="nav-link">Gallery</router-link>
           <router-link :to="{ name: 'manage-team' }" class="nav-link">Our Team</router-link>
           <router-link :to="{ name: 'news-home' }" class="nav-link">News</router-link>
           <router-link :to="{ name: 'manage-schemes' }" class="nav-link">Schemes</router-link>
@@ -68,7 +49,7 @@
             title="Terminate Session"
             class="p-2.5 bg-red-500/15 text-red-300 hover:text-white hover:bg-gradient-to-r hover:from-red-600 hover:to-rose-500 rounded-xl transition-all shadow-[0_0_15px_rgba(239,68,68,0.2)] border border-red-500/30"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" /></svg>
           </button>
         </div>
 
@@ -90,7 +71,7 @@
           <!-- Red logout icon badge -->
           <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/15 border border-red-500/30 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.25)]">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3v1" />
             </svg>
           </div>
 
@@ -126,61 +107,14 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import { ref } from "vue";
 import { useAuthStore } from "../Stores/authStore";
 import router from "@/router";
 
 export default {
   setup() {
-    const route = useRoute();
     const authStore = useAuthStore();
     const showLogoutModal = ref(false);
-
-    const documentsDropdownLabel = computed(() => {
-      const path = (route.path || "").toLowerCase();
-      const name = (route.name || "").toString().toLowerCase();
-
-      // Display 'ACTION PLANS' when on the publications/action-plans route
-      if (
-        path.includes("publication") ||
-        path.includes("action") ||
-        name.includes("publication") ||
-        name.includes("action")
-      ) {
-        return "ACTION PLANS";
-      }
-
-      // Display 'GALLERY' when on the gallery route
-      if (
-        path.includes("gallery") ||
-        name.includes("gallery") ||
-        path.includes("/admin/gallery")
-      ) {
-        return "GALLERY";
-      }
-
-      // Display 'FIELD VISITS' when on field visits route
-      if (
-        path.includes("field-visit") ||
-        name.includes("field-visit") ||
-        path.includes("/admin/field-visits")
-      ) {
-        return "FIELD VISITS";
-      }
-
-      // Display 'EVENTS' when on the events route
-      if (path.includes("event") || name.includes("event")) {
-        return "EVENTS";
-      }
-
-      // Revert back to 'DOCUMENTS' on any other route
-      return "DOCUMENTS";
-    });
-
-    const isDocumentsActive = computed(() => {
-      return documentsDropdownLabel.value !== "DOCUMENTS";
-    });
 
     const confirmLogout = async () => {
       showLogoutModal.value = false;
@@ -191,9 +125,7 @@ export default {
     return { 
       authStore, 
       showLogoutModal, 
-      confirmLogout, 
-      documentsDropdownLabel, 
-      isDocumentsActive 
+      confirmLogout
     };
   },
 };
@@ -212,13 +144,4 @@ export default {
 .nav-link-special {
   @apply px-4 py-2 text-[13px] font-bold uppercase tracking-wider text-amber-300 hover:text-amber-200 hover:bg-amber-400/10 rounded-xl transition-all;
 }
-
-.dropdown-link {
-  @apply block px-5 py-3 text-[12px] font-bold uppercase tracking-wider text-cyan-100/90 hover:text-white hover:bg-[#008795]/50 transition-all;
-}
-
-.router-link-active.dropdown-link {
-  @apply text-white bg-[#008795];
-}
 </style>
-
