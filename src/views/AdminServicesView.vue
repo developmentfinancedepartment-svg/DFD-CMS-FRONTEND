@@ -76,6 +76,7 @@
               class="px-3.5 py-2.5 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-700"
             >
               <option value="All Categories">All Categories</option>
+              <option value="Interest Subsidy Loan Schemes">Interest Subsidy Loan Schemes</option>
               <option value="MSME Revitalization">MSME Revitalization</option>
               <option value="Agriculture & Livestock">Agriculture &amp; Livestock</option>
               <option value="Green Energy">Green Energy</option>
@@ -370,6 +371,7 @@
               class="w-full px-4 py-2.5 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-800"
             >
               <option value="" disabled>Select a category</option>
+              <option value="Interest Subsidy Loan Schemes">Interest Subsidy Loan Schemes</option>
               <option value="MSME Revitalization">MSME Revitalization</option>
               <option value="Agriculture & Livestock">Agriculture &amp; Livestock</option>
               <option value="Green Energy">Green Energy</option>
@@ -641,7 +643,7 @@ const form = ref(defaultForm());
 const activeCount = computed(() => schemes.value.filter(s => s.active).length);
 
 const customCategories = computed(() => {
-  const standard = ['MSME Revitalization', 'Agriculture & Livestock', 'Green Energy'];
+  const standard = ['Interest Subsidy Loan Schemes', 'MSME Revitalization', 'Agriculture & Livestock', 'Green Energy'];
   const found = schemes.value.map(s => s.category).filter(c => c && !standard.includes(c));
   return [...new Set(found)];
 });
