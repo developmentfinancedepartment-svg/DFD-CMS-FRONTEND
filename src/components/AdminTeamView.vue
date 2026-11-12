@@ -13,7 +13,7 @@
             Manage Our Team
           </h1>
           <p class="text-slate-500 mt-1 text-sm">
-            Maintain leadership records, divisional hierarchy, room allocations, intercom extensions, and contact channels.
+            Maintain leadership records, divisional assignment, room allocations, intercom extensions, and contact channels.
           </p>
         </div>
 
@@ -71,7 +71,7 @@
           <i class="fas fa-check-circle text-emerald-600 text-base"></i>
           <span>{{ successMessage }}</span>
         </div>
-        <button type="button" @click="dismissSuccessAlert" class="text-emerald-600 hover:text-emerald-800 p-1">
+        <button type="button" @click="dismissSuccessAlert" class="text-emerald-600 hover:text-emerald-800 p-1 cursor-pointer">
           <i class="fas fa-times text-xs"></i>
         </button>
       </div>
@@ -81,7 +81,7 @@
           <i class="fas fa-exclamation-triangle text-rose-600 text-base"></i>
           <span>{{ errorMessage }}</span>
         </div>
-        <button type="button" @click="errorMessage = ''" class="text-rose-600 hover:text-rose-800 p-1">
+        <button type="button" @click="errorMessage = ''" class="text-rose-600 hover:text-rose-800 p-1 cursor-pointer">
           <i class="fas fa-times text-xs"></i>
         </button>
       </div>
@@ -142,53 +142,24 @@
               </div>
             </div>
 
-            <!-- Division & Hierarchy Level (2 Columns) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <!-- Division -->
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Division <span class="text-rose-500">*</span>
-                </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-sitemap text-xs"></i>
-                  </div>
-                  <select
-                    v-model="form.division"
-                    required
-                    class="w-full pl-10 pr-8 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
-                  >
-                    <option v-for="div in divisionOptions" :key="div" :value="div">{{ div }}</option>
-                  </select>
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                  </div>
+            <!-- Division (Expanded Full-Width Clean Dropdown) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Division <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i class="fas fa-sitemap text-xs"></i>
                 </div>
-              </div>
-
-              <!-- Hierarchy Level -->
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Hierarchy Level <span class="text-rose-500">*</span>
-                </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-layer-group text-xs"></i>
-                  </div>
-                  <select
-                    v-model="form.hierarchyLevel"
-                    required
-                    class="w-full pl-10 pr-8 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
-                  >
-                    <option value="HEAD">Head of Department (HEAD)</option>
-                    <option value="ADG">Additional Director General (ADG)</option>
-                    <option value="DIRECTOR">Director (DIRECTOR)</option>
-                    <option value="DEPUTY_DIRECTOR">Deputy Director (DEPUTY)</option>
-                    <option value="ASSISTANT_DIRECTOR">Assistant Director &amp; Officer</option>
-                  </select>
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-chevron-down text-[10px]"></i>
-                  </div>
+                <select
+                  v-model="form.division"
+                  required
+                  class="w-full pl-10 pr-8 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
+                >
+                  <option v-for="div in divisionOptions" :key="div" :value="div">{{ div }}</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fas fa-chevron-down text-[10px]"></i>
                 </div>
               </div>
             </div>
@@ -268,42 +239,40 @@
               </div>
             </div>
 
-            <!-- Mobile & Residence / Fax -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <!-- Mobile Phone & Fax Number (Clean 2-Column Side-by-Side Grid) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Mobile Phone
                 </label>
-                <input
-                  v-model="form.mobilePhone"
-                  type="text"
-                  placeholder="+94 71 845 2100"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Residence Phone
-                </label>
-                <input
-                  v-model="form.resPhone"
-                  type="text"
-                  placeholder="+94 11 287 1420"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-mobile-alt text-xs"></i>
+                  </div>
+                  <input
+                    v-model="form.mobilePhone"
+                    type="text"
+                    placeholder="+94 71 845 2100"
+                    class="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                  />
+                </div>
               </div>
 
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Fax Number
                 </label>
-                <input
-                  v-model="form.fax"
-                  type="text"
-                  placeholder="+94 11 248 4512"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-fax text-xs"></i>
+                  </div>
+                  <input
+                    v-model="form.fax"
+                    type="text"
+                    placeholder="+94 11 248 4512"
+                    class="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                  />
+                </div>
               </div>
             </div>
 
@@ -401,7 +370,7 @@
                 v-if="searchQuery"
                 @click="searchQuery = ''"
                 type="button"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <i class="fas fa-times text-xs"></i>
               </button>
@@ -464,18 +433,12 @@
             >
               <div class="flex items-start justify-between gap-3">
                 <div class="space-y-1.5 min-w-0 flex-1">
-                  <!-- Badges: Hierarchy & Division -->
+                  <!-- Badges: Division & Order (Hierarchy Pill Badges Removed) -->
                   <div class="flex flex-wrap items-center gap-1.5">
-                    <span
-                      class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider"
-                      :class="hierarchyBadgeClass(member.hierarchyLevel)"
-                    >
-                      {{ formatHierarchyLevel(member.hierarchyLevel) }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200/80">
                       {{ member.division }}
                     </span>
-                    <span v-if="member.displayOrder" class="px-1.5 py-0.5 rounded-md text-[10px] font-mono text-slate-400 bg-slate-50">
+                    <span v-if="member.displayOrder" class="px-1.5 py-0.5 rounded-md text-[10px] font-mono text-slate-400 bg-slate-50 border border-slate-100">
                       #{{ member.displayOrder }}
                     </span>
                   </div>
@@ -488,7 +451,7 @@
                     {{ member.designation }}
                   </p>
 
-                  <!-- Location & Contacts Tags -->
+                  <!-- Location & Contacts Tags (Residence Phone Removed) -->
                   <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-500">
                     <span v-if="member.room" class="inline-flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
                       <i class="fas fa-map-marker-alt text-teal-600 text-[10px]"></i>
@@ -508,6 +471,11 @@
                     <span v-if="member.mobilePhone" class="inline-flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
                       <i class="fas fa-mobile-alt text-slate-400 text-[10px]"></i>
                       <span>{{ member.mobilePhone }}</span>
+                    </span>
+
+                    <span v-if="member.fax" class="inline-flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                      <i class="fas fa-fax text-slate-400 text-[10px]"></i>
+                      <span>Fax: {{ member.fax }}</span>
                     </span>
 
                     <span v-if="member.primaryEmail" class="inline-flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100 truncate max-w-xs">
@@ -543,251 +511,285 @@
 
       </div>
 
-      <!-- 3. EDIT OFFICIAL MODAL -->
+      <!-- 3. EDIT OFFICIAL MODAL (Compact, Viewport-Fitted, High z-index, Pinned Header & Footer) -->
       <div
         v-if="isEditModalOpen"
-        @click.self="closeEditModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
+        @click.self="closeEditModal(false)"
+        class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4"
       >
-        <div class="relative w-full max-w-2xl rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-slate-100 my-8 transform transition-all animate-in fade-in zoom-in-95 duration-150">
-          <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+        <div class="relative w-full max-w-2xl max-h-[85vh] flex flex-col rounded-3xl bg-white shadow-2xl border border-slate-100 transform transition-all animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+          
+          <!-- Fixed Modal Header -->
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0 bg-white">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#008795]">
-                <i class="fas fa-user-edit text-sm"></i>
+              <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#008795]">
+                <i class="fas fa-user-edit text-xs"></i>
               </div>
               <div>
-                <h3 class="text-lg font-bold text-slate-800">Edit Official</h3>
-                <p class="text-xs text-slate-400">Update official credentials, contacts, and assignment</p>
+                <h3 class="text-base font-bold text-slate-800">Edit Official</h3>
+                <p class="text-[11px] text-slate-400">Update official credentials, contacts, and assignment</p>
               </div>
             </div>
             <button
               type="button"
               :disabled="isUpdating"
-              @click="closeEditModal"
-              class="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition disabled:opacity-50"
+              @click="closeEditModal(false)"
+              class="p-1.5 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100 transition disabled:opacity-50 cursor-pointer"
             >
               <i class="fas fa-times text-sm"></i>
             </button>
           </div>
 
-          <!-- Modal Error Alert -->
-          <div v-if="editErrorMessage" class="p-3 mb-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <i class="fas fa-exclamation-circle text-rose-600"></i>
-              <span>{{ editErrorMessage }}</span>
-            </div>
-            <button type="button" @click="editErrorMessage = ''" class="text-rose-500 hover:text-rose-700">
-              <i class="fas fa-times text-xs"></i>
-            </button>
-          </div>
-
-          <form @submit.prevent="handleUpdate" class="space-y-4">
-            <!-- Full Name -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Full Name <span class="text-rose-500">*</span>
-              </label>
-              <input
-                v-model="editForm.name"
-                type="text"
-                required
-                class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-              />
+          <!-- Scrollable Form Body -->
+          <div class="p-5 sm:p-6 overflow-y-auto space-y-3.5 flex-1 custom-scrollbar">
+            <!-- Modal Error Alert -->
+            <div v-if="editErrorMessage" class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-exclamation-circle text-rose-600"></i>
+                <span>{{ editErrorMessage }}</span>
+              </div>
+              <button type="button" @click="editErrorMessage = ''" class="text-rose-500 hover:text-rose-700 cursor-pointer">
+                <i class="fas fa-times text-xs"></i>
+              </button>
             </div>
 
-            <!-- Designation -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Designation / Role Title <span class="text-rose-500">*</span>
-              </label>
-              <input
-                v-model="editForm.designation"
-                type="text"
-                required
-                class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-              />
-            </div>
+            <form id="editOfficialForm" @submit.prevent="handleUpdate" class="space-y-3.5">
+              <!-- Full Name -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Full Name <span class="text-rose-500">*</span>
+                </label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-user text-xs"></i>
+                  </div>
+                  <input
+                    v-model="editForm.name"
+                    type="text"
+                    required
+                    class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                  />
+                </div>
+              </div>
 
-            <!-- Division & Hierarchy Level -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <!-- Designation -->
+              <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Designation / Role Title <span class="text-rose-500">*</span>
+                </label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-id-badge text-xs"></i>
+                  </div>
+                  <input
+                    v-model="editForm.designation"
+                    type="text"
+                    required
+                    class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                  />
+                </div>
+              </div>
+
+              <!-- Division (Full-Width Clean Dropdown, Hierarchy Level Removed) -->
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Division <span class="text-rose-500">*</span>
                 </label>
-                <select
-                  v-model="editForm.division"
-                  required
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                >
-                  <option v-for="div in divisionOptions" :key="div" :value="div">{{ div }}</option>
-                </select>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-sitemap text-xs"></i>
+                  </div>
+                  <select
+                    v-model="editForm.division"
+                    required
+                    class="w-full pl-10 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
+                  >
+                    <option v-for="div in divisionOptions" :key="div" :value="div">{{ div }}</option>
+                  </select>
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-chevron-down text-[10px]"></i>
+                  </div>
+                </div>
               </div>
 
+              <!-- Room & Display Order (2 Columns) -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Room / Office Location
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-map-marker-alt text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.room"
+                      type="text"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Display Order
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-sort-numeric-down text-xs"></i>
+                    </div>
+                    <input
+                      v-model.number="editForm.displayOrder"
+                      type="number"
+                      min="1"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contact Numbers (Office & Intercom Ext) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Office Phone
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-phone text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.officePhone"
+                      type="text"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Extension (Intercom)
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-phone-volume text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.extension"
+                      type="text"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mobile Phone & Fax Number (Clean 2-Column Grid, Residence Phone Removed) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Mobile Phone
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-mobile-alt text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.mobilePhone"
+                      type="text"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Fax Number
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-fax text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.fax"
+                      type="text"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Primary & Secondary Emails (2 Columns) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Primary Email
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-envelope text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.primaryEmail"
+                      type="email"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Secondary / Alt Email
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <i class="fas fa-at text-xs"></i>
+                    </div>
+                    <input
+                      v-model="editForm.secondaryEmail"
+                      type="email"
+                      class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Hierarchy Level <span class="text-rose-500">*</span>
+                  Role Description / Mandate
                 </label>
-                <select
-                  v-model="editForm.hierarchyLevel"
-                  required
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                >
-                  <option value="HEAD">Head of Department (HEAD)</option>
-                  <option value="ADG">Additional Director General (ADG)</option>
-                  <option value="DIRECTOR">Director (DIRECTOR)</option>
-                  <option value="DEPUTY_DIRECTOR">Deputy Director (DEPUTY)</option>
-                  <option value="ASSISTANT_DIRECTOR">Assistant Director &amp; Officer</option>
-                </select>
+                <textarea
+                  v-model="editForm.description"
+                  rows="2"
+                  class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium resize-none"
+                ></textarea>
               </div>
-            </div>
+            </form>
+          </div>
 
-            <!-- Room & Display Order -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Room / Office Location
-                </label>
-                <input
-                  v-model="editForm.room"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Display Order
-                </label>
-                <input
-                  v-model.number="editForm.displayOrder"
-                  type="number"
-                  min="1"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-            </div>
-
-            <!-- Contact Numbers -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Office Phone
-                </label>
-                <input
-                  v-model="editForm.officePhone"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Extension (Intercom)
-                </label>
-                <input
-                  v-model="editForm.extension"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-            </div>
-
-            <!-- Mobile, Res, Fax -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Mobile Phone
-                </label>
-                <input
-                  v-model="editForm.mobilePhone"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Residence Phone
-                </label>
-                <input
-                  v-model="editForm.resPhone"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Fax
-                </label>
-                <input
-                  v-model="editForm.fax"
-                  type="text"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-            </div>
-
-            <!-- Emails -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Primary Email
-                </label>
-                <input
-                  v-model="editForm.primaryEmail"
-                  type="email"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Secondary / Alt Email
-                </label>
-                <input
-                  v-model="editForm.secondaryEmail"
-                  type="email"
-                  class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-            </div>
-
-            <!-- Description -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Role Description / Mandate
-              </label>
-              <textarea
-                v-model="editForm.description"
-                rows="2"
-                class="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium resize-none"
-              ></textarea>
-            </div>
-
-            <!-- Modal Action Buttons -->
-            <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                :disabled="isUpdating"
-                @click="closeEditModal"
-                class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                :disabled="isUpdating"
-                class="px-6 py-2.5 bg-gradient-to-r from-[#008795] to-[#003842] hover:opacity-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition disabled:opacity-50 flex items-center gap-2"
-              >
-                <svg v-if="isUpdating" class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <span>{{ isUpdating ? 'Saving Changes...' : 'Save Changes' }}</span>
-              </button>
-            </div>
-          </form>
+          <!-- Fixed Modal Footer (Always Visible at Viewport Bottom) -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3 flex-shrink-0">
+            <button
+              type="button"
+              :disabled="isUpdating"
+              @click="closeEditModal(false)"
+              class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 transition disabled:opacity-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="editOfficialForm"
+              :disabled="isUpdating"
+              class="px-5 py-2 bg-gradient-to-r from-[#008795] to-[#003842] hover:opacity-95 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+            >
+              <svg v-if="isUpdating" class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>{{ isUpdating ? 'Saving Changes...' : 'Save Changes' }}</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -795,7 +797,7 @@
       <div
         v-if="showDeleteModal"
         @click.self="closeDeleteModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       >
         <div class="relative w-full max-w-md rounded-3xl bg-[#002b32] border border-cyan-500/30 p-6 shadow-2xl text-center">
           <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-4">
@@ -818,7 +820,7 @@
               type="button"
               :disabled="isDeleting"
               @click="closeDeleteModal"
-              class="flex-1 py-2.5 rounded-xl border border-cyan-400/25 bg-white/5 text-xs font-bold text-cyan-100 hover:bg-white/10 transition disabled:opacity-50"
+              class="flex-1 py-2.5 rounded-xl border border-cyan-400/25 bg-white/5 text-xs font-bold text-cyan-100 hover:bg-white/10 transition disabled:opacity-50 cursor-pointer"
             >
               Cancel
             </button>
@@ -826,7 +828,7 @@
               type="button"
               :disabled="isDeleting"
               @click="confirmDelete"
-              class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 text-xs font-bold text-white shadow-lg transition hover:from-red-500 hover:to-rose-600 disabled:opacity-50 flex items-center justify-center gap-2"
+              class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-500 text-xs font-bold text-white shadow-lg transition hover:from-red-500 hover:to-rose-600 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
             >
               <svg v-if="isDeleting" class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -880,13 +882,11 @@ const initialForm = () => ({
   name: '',
   designation: '',
   division: 'Financial Solution',
-  hierarchyLevel: 'DIRECTOR',
   room: '',
   description: '',
   officePhone: '',
   extension: '',
   mobilePhone: '',
-  resPhone: '',
   fax: '',
   primaryEmail: '',
   secondaryEmail: '',
@@ -895,23 +895,23 @@ const initialForm = () => ({
 
 const form = ref(initialForm());
 
-const editForm = ref({
+const initialEditForm = () => ({
   id: null,
   name: '',
   designation: '',
   division: 'Financial Solution',
-  hierarchyLevel: 'DIRECTOR',
   room: '',
   description: '',
   officePhone: '',
   extension: '',
   mobilePhone: '',
-  resPhone: '',
   fax: '',
   primaryEmail: '',
   secondaryEmail: '',
   displayOrder: 10
 });
+
+const editForm = ref(initialEditForm());
 
 // Notifications
 const showSuccess = (msg) => {
@@ -931,41 +931,6 @@ const dismissSuccessAlert = () => {
   successMessage.value = '';
 };
 
-// Hierarchy level badge styling
-const hierarchyBadgeClass = (level) => {
-  switch (level) {
-    case 'HEAD':
-      return 'bg-teal-600 text-white shadow-xs';
-    case 'ADG':
-      return 'bg-indigo-600 text-white';
-    case 'DIRECTOR':
-      return 'bg-cyan-700 text-white';
-    case 'DEPUTY_DIRECTOR':
-      return 'bg-emerald-700 text-white';
-    case 'ASSISTANT_DIRECTOR':
-      return 'bg-slate-700 text-white';
-    default:
-      return 'bg-slate-500 text-white';
-  }
-};
-
-const formatHierarchyLevel = (level) => {
-  switch (level) {
-    case 'HEAD':
-      return 'Head of Dept';
-    case 'ADG':
-      return 'ADG';
-    case 'DIRECTOR':
-      return 'Director';
-    case 'DEPUTY_DIRECTOR':
-      return 'Deputy Director';
-    case 'ASSISTANT_DIRECTOR':
-      return 'Asst. Director / Officer';
-    default:
-      return level;
-  }
-};
-
 // Computed Stats
 const distinctDivisionsCount = computed(() => {
   const set = new Set(teamMembers.value.map(m => m.division).filter(Boolean));
@@ -973,7 +938,10 @@ const distinctDivisionsCount = computed(() => {
 });
 
 const leadershipCount = computed(() => {
-  return teamMembers.value.filter(m => ['HEAD', 'ADG', 'DIRECTOR'].includes(m.hierarchyLevel)).length;
+  return teamMembers.value.filter(m => {
+    const des = (m.designation || '').toLowerCase();
+    return des.includes('director') || des.includes('adg') || des.includes('head');
+  }).length;
 });
 
 const extensionsCount = computed(() => {
@@ -998,10 +966,11 @@ const filteredOfficials = computed(() => {
       const matchExt = m.extension && m.extension.toLowerCase().includes(query);
       const matchOffice = m.officePhone && m.officePhone.toLowerCase().includes(query);
       const matchMobile = m.mobilePhone && m.mobilePhone.toLowerCase().includes(query);
+      const matchFax = m.fax && m.fax.toLowerCase().includes(query);
       const matchEmail1 = m.primaryEmail && m.primaryEmail.toLowerCase().includes(query);
       const matchEmail2 = m.secondaryEmail && m.secondaryEmail.toLowerCase().includes(query);
 
-      return matchName || matchDesig || matchDiv || matchRoom || matchExt || matchOffice || matchMobile || matchEmail1 || matchEmail2;
+      return matchName || matchDesig || matchDiv || matchRoom || matchExt || matchOffice || matchMobile || matchFax || matchEmail1 || matchEmail2;
     });
   }
 
@@ -1041,13 +1010,11 @@ const handleCreate = async () => {
       name: form.value.name.trim(),
       designation: form.value.designation.trim(),
       division: form.value.division,
-      hierarchyLevel: form.value.hierarchyLevel,
       room: form.value.room ? form.value.room.trim() : null,
       description: form.value.description ? form.value.description.trim() : null,
       officePhone: form.value.officePhone ? form.value.officePhone.trim() : null,
       extension: form.value.extension ? form.value.extension.trim() : null,
       mobilePhone: form.value.mobilePhone ? form.value.mobilePhone.trim() : null,
-      resPhone: form.value.resPhone ? form.value.resPhone.trim() : null,
       fax: form.value.fax ? form.value.fax.trim() : null,
       primaryEmail: form.value.primaryEmail ? form.value.primaryEmail.trim() : null,
       secondaryEmail: form.value.secondaryEmail ? form.value.secondaryEmail.trim() : null,
@@ -1057,7 +1024,6 @@ const handleCreate = async () => {
     const res = await axios.post('/api/v1/team-members', payload);
     if (res.data) {
       teamMembers.value.push(res.data);
-      // Resort by displayOrder
       teamMembers.value.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
     }
     showSuccess(`Official "${payload.name}" added successfully.`);
@@ -1078,13 +1044,11 @@ const openEditModal = (member) => {
     name: member.name || '',
     designation: member.designation || '',
     division: member.division || 'Financial Solution',
-    hierarchyLevel: member.hierarchyLevel || 'DIRECTOR',
     room: member.room || '',
     description: member.description || '',
     officePhone: member.officePhone || '',
     extension: member.extension || '',
     mobilePhone: member.mobilePhone || '',
-    resPhone: member.resPhone || '',
     fax: member.fax || '',
     primaryEmail: member.primaryEmail || '',
     secondaryEmail: member.secondaryEmail || '',
@@ -1093,10 +1057,11 @@ const openEditModal = (member) => {
   isEditModalOpen.value = true;
 };
 
-const closeEditModal = () => {
-  if (isUpdating.value) return;
+const closeEditModal = (force = false) => {
+  if (isUpdating.value && !force) return;
   isEditModalOpen.value = false;
   editErrorMessage.value = '';
+  editForm.value = initialEditForm();
 };
 
 const handleUpdate = async () => {
@@ -1113,13 +1078,11 @@ const handleUpdate = async () => {
       name: editForm.value.name.trim(),
       designation: editForm.value.designation.trim(),
       division: editForm.value.division,
-      hierarchyLevel: editForm.value.hierarchyLevel,
       room: editForm.value.room ? editForm.value.room.trim() : null,
       description: editForm.value.description ? editForm.value.description.trim() : null,
       officePhone: editForm.value.officePhone ? editForm.value.officePhone.trim() : null,
       extension: editForm.value.extension ? editForm.value.extension.trim() : null,
       mobilePhone: editForm.value.mobilePhone ? editForm.value.mobilePhone.trim() : null,
-      resPhone: editForm.value.resPhone ? editForm.value.resPhone.trim() : null,
       fax: editForm.value.fax ? editForm.value.fax.trim() : null,
       primaryEmail: editForm.value.primaryEmail ? editForm.value.primaryEmail.trim() : null,
       secondaryEmail: editForm.value.secondaryEmail ? editForm.value.secondaryEmail.trim() : null,
@@ -1128,8 +1091,8 @@ const handleUpdate = async () => {
 
     await axios.put(`/api/v1/team-members/${editForm.value.id}`, payload);
     showSuccess(`Official "${payload.name}" updated successfully.`);
-    closeEditModal();
-    await fetchTeamMembers();
+    closeEditModal(true); // Auto-close modal immediately upon success
+    await fetchTeamMembers(); // Refresh officials list
   } catch (error) {
     console.error('Failed to update team member:', error);
     editErrorMessage.value = error.response?.data?.message || 'Failed to update official record.';
