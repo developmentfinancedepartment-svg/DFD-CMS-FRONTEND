@@ -119,80 +119,73 @@
         </div>
       </div>
 
-      <!-- 3. MODERN TABLE CONTAINER (ROUNDED-3XL CARD WITH BORDER-SEPARATE ROW SPACING) -->
-      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-[0_10px_35px_rgba(0,135,149,0.05)] overflow-hidden p-4 lg:p-6 flex-1 min-h-0 flex flex-col">
-        <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
-          <table class="w-full text-left border-separate border-spacing-y-2.5">
-            <thead class="sticky top-0 z-20 bg-slate-100 shadow-sm">
-              <tr class="bg-slate-100 text-[11px] font-semibold text-slate-500 tracking-wider uppercase">
-                <th class="px-6 py-3.5 first:rounded-l-2xl last:rounded-r-2xl">Scheme / Program Details</th>
-                <th class="px-6 py-3.5">Category</th>
-                <th class="px-6 py-3.5">Facility / Scope</th>
-                <th class="px-6 py-3.5">Interest / Terms</th>
-                <th class="px-6 py-3.5">Description</th>
-                <th class="px-6 py-3.5 text-center">Status</th>
-                <th class="px-6 py-3.5 text-right first:rounded-l-2xl last:rounded-r-2xl">Actions</th>
+      <!-- 3. BALANCED 6-COLUMN TABLE CONTAINER -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-4 lg:p-5 flex-1 min-h-0 flex flex-col">
+        <div class="flex-1 min-h-0 overflow-y-auto overflow-x-auto sm:overflow-x-visible custom-scrollbar">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 z-10 bg-slate-50/95 backdrop-blur-sm border-b border-slate-200">
+              <tr class="text-[11px] font-bold text-slate-500 tracking-wider uppercase">
+                <th class="py-3 px-4 min-w-[240px]">Scheme / Program</th>
+                <th class="py-3 px-4 whitespace-nowrap">Category</th>
+                <th class="py-3 px-4 whitespace-nowrap">Facility / Scope</th>
+                <th class="py-3 px-4 whitespace-nowrap">Interest / Terms</th>
+                <th class="py-3 px-4 text-center whitespace-nowrap">Status</th>
+                <th class="py-3 px-4 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
-            <tbody class="text-sm">
+            <tbody class="divide-y divide-slate-100 text-sm">
               <tr
-                v-for="(scheme, index) in paginatedSchemes"
+                v-for="scheme in paginatedSchemes"
                 :key="scheme.id"
-                :class="[
-                  'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md group',
-                  index % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'
-                ]"
+                class="hover:bg-slate-50/80 transition-colors group"
               >
-                <!-- Scheme Details (Icon, Title, Type Pill, Icon Code) -->
-                <td class="px-6 py-5 border-y first:border-l last:border-r border-slate-200/80 group-hover:border-cyan-500/60 transition-colors first:rounded-l-2xl last:rounded-r-2xl">
-                  <div class="flex items-center gap-3.5">
+                <!-- 1. Scheme / Program (Icon + Title + Type Pill) -->
+                <td class="py-3.5 px-4 min-w-[240px]">
+                  <div class="flex items-center gap-3 min-w-0">
                     <div
                       :class="[
-                        'w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 transition-transform text-white',
+                        'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm text-white',
                         scheme.schemeType === 'SERVICE'
-                          ? 'bg-gradient-to-br from-amber-500 to-amber-700 shadow-amber-900/15'
-                          : 'bg-gradient-to-br from-[#008795] to-[#005a66] shadow-cyan-900/15'
+                          ? 'bg-gradient-to-br from-indigo-500 to-indigo-700'
+                          : 'bg-gradient-to-br from-[#008795] to-[#006071]'
                       ]"
                     >
-                      <i :class="scheme.icon || (scheme.schemeType === 'SERVICE' ? 'fas fa-warehouse' : 'fas fa-hand-holding-usd')" class="text-base"></i>
+                      <i :class="scheme.icon || (scheme.schemeType === 'SERVICE' ? 'fas fa-warehouse' : 'fas fa-hand-holding-usd')" class="text-sm"></i>
                     </div>
-                    <div>
-                      <div class="flex items-center gap-2">
+                    <div class="min-w-0 flex-1">
+                      <div class="font-bold text-slate-800 text-sm truncate" :title="scheme.title">
+                        {{ scheme.title }}
+                      </div>
+                      <div class="mt-0.5">
                         <span
                           v-if="scheme.schemeType === 'SERVICE'"
-                          class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200 uppercase tracking-wider"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 uppercase tracking-wider whitespace-nowrap"
                         >
-                          Institutional Service
+                          SERVICE
                         </span>
                         <span
                           v-else
-                          class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200 uppercase tracking-wider"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200/80 uppercase tracking-wider whitespace-nowrap"
                         >
-                          Loan Scheme
+                          LOAN
                         </span>
-                      </div>
-                      <div class="font-extrabold text-slate-900 group-hover:text-[#007c91] transition-colors leading-snug mt-1">
-                        {{ scheme.title }}
-                      </div>
-                      <div class="text-[11px] text-slate-400 font-mono mt-0.5">
-                        {{ scheme.icon }}
                       </div>
                     </div>
                   </div>
                 </td>
 
-                <!-- Category Badge -->
-                <td class="px-6 py-5 whitespace-nowrap border-y border-slate-200/80 group-hover:border-cyan-500/60 transition-colors">
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-cyan-50 text-cyan-800 border border-cyan-200/80">
+                <!-- 2. Category Badge -->
+                <td class="py-3.5 px-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/70 whitespace-nowrap">
                     {{ scheme.category }}
                   </span>
                 </td>
 
-                <!-- Max Amount / Scope -->
-                <td class="px-6 py-5 font-bold text-slate-700 whitespace-nowrap border-y border-slate-200/80 group-hover:border-cyan-500/60 transition-colors">
+                <!-- 3. Facility / Scope -->
+                <td class="py-3.5 px-4 whitespace-nowrap">
                   <template v-if="scheme.schemeType === 'SERVICE'">
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600">
-                      <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                      <svg class="w-3.5 h-3.5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -200,72 +193,67 @@
                     </span>
                   </template>
                   <template v-else>
-                    {{ scheme.maxAmount || '—' }}
+                    <span class="font-semibold text-slate-800 text-sm whitespace-nowrap">
+                      {{ scheme.maxAmount || '—' }}
+                    </span>
                   </template>
                 </td>
 
-                <!-- Interest Rate / Terms -->
-                <td class="px-6 py-5 whitespace-nowrap border-y border-slate-200/80 group-hover:border-cyan-500/60 transition-colors">
+                <!-- 4. Interest / Terms -->
+                <td class="py-3.5 px-4 whitespace-nowrap">
                   <template v-if="scheme.schemeType === 'SERVICE'">
-                    <span class="text-xs text-slate-400 font-medium">Non-Financial Facility</span>
+                    <span class="text-xs text-slate-400 font-medium whitespace-nowrap">Non-Financial Facility</span>
                   </template>
                   <template v-else>
-                    <div class="font-extrabold text-[#007c91]">
+                    <div class="font-bold text-[#007c91] text-sm whitespace-nowrap">
                       {{ scheme.interestRate || '—' }}
                     </div>
-                    <div v-if="scheme.subsidyDetails" class="text-[10px] text-teal-600 font-medium">
+                    <div v-if="scheme.subsidyDetails" class="text-[10px] text-teal-600 font-medium whitespace-nowrap truncate max-w-[160px]" :title="scheme.subsidyDetails">
                       + {{ scheme.subsidyDetails }}
                     </div>
                   </template>
                 </td>
 
-                <!-- Description -->
-                <td class="px-6 py-5 text-slate-500 max-w-xs text-xs leading-relaxed border-y border-slate-200/80 group-hover:border-cyan-500/60 transition-colors">
-                  <p class="line-clamp-2" :title="scheme.description">
-                    {{ scheme.description }}
-                  </p>
-                </td>
-
-                <!-- Status Pill with Dot -->
-                <td class="px-6 py-5 text-center whitespace-nowrap border-y border-slate-200/80 group-hover:border-cyan-500/60 transition-colors">
+                <!-- 5. Status Pill with Dot -->
+                <td class="py-3.5 px-4 text-center whitespace-nowrap">
                   <button
                     @click="toggleActiveStatus(scheme)"
                     :title="scheme.active ? 'Click to deactivate' : 'Click to activate'"
                     :class="[
-                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all duration-200 border',
+                      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all border',
                       scheme.active
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 shadow-sm shadow-emerald-500/10'
-                        : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 hover:border-rose-300 shadow-sm shadow-rose-500/10'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                        : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
                     ]"
                   >
                     <span
                       :class="[
-                        'h-2 w-2 rounded-full',
-                        scheme.active ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-rose-500'
+                        'h-1.5 w-1.5 rounded-full shrink-0',
+                        scheme.active ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-rose-500'
                       ]"
                     ></span>
                     {{ scheme.active ? 'Active' : 'Inactive' }}
                   </button>
                 </td>
 
-                <!-- Actions -->
-                <td class="px-6 py-5 text-right whitespace-nowrap border-y first:border-l last:border-r border-slate-200/80 group-hover:border-cyan-500/60 transition-colors first:rounded-l-2xl last:rounded-r-2xl">
-                  <div class="inline-flex items-center justify-end gap-1.5">
+                <!-- 6. Actions -->
+                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                  <div class="inline-flex items-center justify-end gap-1">
                     <button
                       @click="openEditModal(scheme)"
-                      class="p-2 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50 rounded-xl transition-all"
+                      class="p-1.5 text-slate-500 hover:text-[#008795] hover:bg-cyan-50 rounded-lg transition"
                       title="Edit Scheme / Service"
                     >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
                     <button
                       @click="openDeleteModal(scheme)"
-                      class="p-2 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-xl transition-all"
+                      class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
                       title="Delete Scheme / Service"
                     >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
@@ -275,7 +263,7 @@
 
               <!-- Loading State -->
               <tr v-if="loading" class="bg-white">
-                <td colspan="7" class="px-6 py-16 text-center text-slate-500 rounded-2xl border border-slate-200/80">
+                <td colspan="6" class="py-12 px-4 text-center text-slate-500">
                   <div class="inline-flex items-center gap-3">
                     <svg class="animate-spin h-5 w-5 text-[#008795]" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -288,7 +276,7 @@
 
               <!-- No Results State -->
               <tr v-if="!loading && filteredSchemes.length === 0" class="bg-white">
-                <td colspan="7" class="px-6 py-16 text-center text-slate-500 rounded-2xl border border-slate-200/80">
+                <td colspan="6" class="py-12 px-4 text-center text-slate-500">
                   <div class="flex flex-col items-center justify-center max-w-sm mx-auto space-y-3">
                     <div class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
