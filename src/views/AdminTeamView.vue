@@ -123,44 +123,141 @@
               </div>
             </div>
 
-            <!-- Designation -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Designation / Role Title <span class="text-rose-500">*</span>
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-id-badge text-xs"></i>
-                </div>
-                <input
-                  v-model="form.designation"
-                  type="text"
-                  required
-                  placeholder="e.g. Director General of Development Finance"
-                  class="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                />
-              </div>
-            </div>
-
-            <!-- Division (Expanded Full-Width Clean Dropdown) -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Division <span class="text-rose-500">*</span>
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-sitemap text-xs"></i>
-                </div>
-                <select
-                  v-model="form.division"
-                  @change="handleDivisionChange"
-                  required
-                  class="w-full pl-10 pr-8 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
+            <!-- Designation & Division (Side-by-Side 2 Columns) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Designation Dropdown -->
+              <div class="relative" ref="designationDropdownRef">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Designation / Role Title <span class="text-rose-500">*</span>
+                </label>
+                <!-- Trigger Button -->
+                <button
+                  type="button"
+                  @click="toggleDesignationDropdown"
+                  class="w-full flex items-center justify-between rounded-xl border border-slate-200 px-3.5 py-2.5 bg-slate-50 hover:bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20 bg-white': isDesignationDropdownOpen }"
                 >
-                  <option v-for="div in divisionOptions" :key="div" :value="div">{{ div }}</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                  <i class="fas fa-chevron-down text-[10px]"></i>
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i class="fas fa-id-badge text-xs text-[#008795]"></i>
+                    <span
+                      class="text-xs truncate"
+                      :class="form.designation ? 'font-semibold text-slate-800' : 'text-slate-400 font-medium'"
+                    >
+                      {{ form.designation || 'Select Designation' }}
+                    </span>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180 text-[#008795]': isDesignationDropdownOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Floating Dropdown Popover -->
+                <div
+                  v-if="isDesignationDropdownOpen"
+                  class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="px-1.5 space-y-0.5">
+                    <div
+                      v-for="role in designationOptions"
+                      :key="role"
+                      @click="selectDesignation(role)"
+                      class="flex items-center justify-between px-4 py-2.5 text-sm rounded-xl transition-colors cursor-pointer"
+                      :class="form.designation === role
+                        ? 'bg-teal-50 text-teal-700 font-semibold'
+                        : 'text-slate-700 hover:bg-teal-50/70 hover:text-teal-700 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate">
+                        <span
+                          v-if="form.designation === role"
+                          class="w-1.5 h-1.5 rounded-full bg-[#008795] shrink-0"
+                        ></span>
+                        <span class="truncate">{{ role }}</span>
+                      </div>
+                      <svg
+                        v-if="form.designation === role"
+                        class="w-4 h-4 text-[#008795] shrink-0 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Division Dropdown -->
+              <div class="relative" ref="divisionDropdownRef">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Division <span class="text-rose-500">*</span>
+                </label>
+                <!-- Trigger Button -->
+                <button
+                  type="button"
+                  @click="toggleDivisionDropdown"
+                  class="w-full flex items-center justify-between rounded-xl border border-slate-200 px-3.5 py-2.5 bg-slate-50 hover:bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                  :class="{ 'border-[#008795] ring-2 ring-[#008795]/20 bg-white': isDivisionDropdownOpen }"
+                >
+                  <div class="flex items-center gap-2.5 truncate">
+                    <i class="fas fa-sitemap text-xs text-[#008795]"></i>
+                    <span
+                      class="text-xs truncate"
+                      :class="form.division ? 'font-semibold text-slate-800' : 'text-slate-400 font-medium'"
+                    >
+                      {{ form.division || 'Select Division' }}
+                    </span>
+                  </div>
+                  <svg
+                    class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                    :class="{ 'rotate-180 text-[#008795]': isDivisionDropdownOpen }"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <!-- Floating Dropdown Popover -->
+                <div
+                  v-if="isDivisionDropdownOpen"
+                  class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150"
+                >
+                  <div class="px-1.5 space-y-0.5">
+                    <div
+                      v-for="div in divisionOptions"
+                      :key="div"
+                      @click="selectDivision(div)"
+                      class="flex items-center justify-between px-4 py-2.5 text-sm rounded-xl transition-colors cursor-pointer"
+                      :class="form.division === div
+                        ? 'bg-teal-50 text-teal-700 font-semibold'
+                        : 'text-slate-700 hover:bg-teal-50/70 hover:text-teal-700 font-medium'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate">
+                        <span
+                          v-if="form.division === div"
+                          class="w-1.5 h-1.5 rounded-full bg-[#008795] shrink-0"
+                        ></span>
+                        <span class="truncate">{{ div }}</span>
+                      </div>
+                      <svg
+                        v-if="form.division === div"
+                        class="w-4 h-4 text-[#008795] shrink-0 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -574,43 +671,139 @@
                 </div>
               </div>
 
-              <!-- Designation -->
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Designation / Role Title <span class="text-rose-500">*</span>
-                </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-id-badge text-xs"></i>
-                  </div>
-                  <input
-                    v-model="editForm.designation"
-                    type="text"
-                    required
-                    class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
-                  />
-                </div>
-              </div>
-
-              <!-- Division (Full-Width Clean Dropdown, Hierarchy Level Removed) -->
-              <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Division <span class="text-rose-500">*</span>
-                </label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-sitemap text-xs"></i>
-                  </div>
-                  <select
-                    v-model="editForm.division"
-                    @change="handleEditDivisionChange"
-                    required
-                    class="w-full pl-10 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
+              <!-- Designation & Division (Side-by-Side 2 Columns) -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Edit Designation Dropdown -->
+                <div class="relative" ref="editDesignationDropdownRef">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Designation / Role Title <span class="text-rose-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    @click="toggleEditDesignationDropdown"
+                    class="w-full flex items-center justify-between rounded-xl border border-slate-200 px-3.5 py-2 bg-slate-50 hover:bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                    :class="{ 'border-[#008795] ring-2 ring-[#008795]/20 bg-white': isEditDesignationDropdownOpen }"
                   >
-                    <option v-for="div in divisionOptions" :key="div" :value="div">{{ div }}</option>
-                  </select>
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-chevron-down text-[10px]"></i>
+                    <div class="flex items-center gap-2.5 truncate">
+                      <i class="fas fa-id-badge text-xs text-[#008795]"></i>
+                      <span
+                        class="text-xs truncate"
+                        :class="editForm.designation ? 'font-semibold text-slate-800' : 'text-slate-400 font-medium'"
+                      >
+                        {{ editForm.designation || 'Select Designation' }}
+                      </span>
+                    </div>
+                    <svg
+                      class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                      :class="{ 'rotate-180 text-[#008795]': isEditDesignationDropdownOpen }"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  <!-- Popover Card -->
+                  <div
+                    v-if="isEditDesignationDropdownOpen"
+                    class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150"
+                  >
+                    <div class="px-1.5 space-y-0.5">
+                      <div
+                        v-for="role in editDesignationOptions"
+                        :key="role"
+                        @click="selectEditDesignation(role)"
+                        class="flex items-center justify-between px-4 py-2.5 text-sm rounded-xl transition-colors cursor-pointer"
+                        :class="editForm.designation === role
+                          ? 'bg-teal-50 text-teal-700 font-semibold'
+                          : 'text-slate-700 hover:bg-teal-50/70 hover:text-teal-700 font-medium'"
+                      >
+                        <div class="flex items-center gap-2.5 truncate">
+                          <span
+                            v-if="editForm.designation === role"
+                            class="w-1.5 h-1.5 rounded-full bg-[#008795] shrink-0"
+                          ></span>
+                          <span class="truncate">{{ role }}</span>
+                        </div>
+                        <svg
+                          v-if="editForm.designation === role"
+                          class="w-4 h-4 text-[#008795] shrink-0 ml-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Edit Division Dropdown -->
+                <div class="relative" ref="editDivisionDropdownRef">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Division <span class="text-rose-500">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    @click="toggleEditDivisionDropdown"
+                    class="w-full flex items-center justify-between rounded-xl border border-slate-200 px-3.5 py-2 bg-slate-50 hover:bg-white text-xs hover:border-[#008795] focus:outline-none focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] transition text-left cursor-pointer shadow-xs"
+                    :class="{ 'border-[#008795] ring-2 ring-[#008795]/20 bg-white': isEditDivisionDropdownOpen }"
+                  >
+                    <div class="flex items-center gap-2.5 truncate">
+                      <i class="fas fa-sitemap text-xs text-[#008795]"></i>
+                      <span
+                        class="text-xs truncate"
+                        :class="editForm.division ? 'font-semibold text-slate-800' : 'text-slate-400 font-medium'"
+                      >
+                        {{ editForm.division || 'Select Division' }}
+                      </span>
+                    </div>
+                    <svg
+                      class="w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2"
+                      :class="{ 'rotate-180 text-[#008795]': isEditDivisionDropdownOpen }"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  <!-- Popover Card -->
+                  <div
+                    v-if="isEditDivisionDropdownOpen"
+                    class="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 max-h-64 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-150"
+                  >
+                    <div class="px-1.5 space-y-0.5">
+                      <div
+                        v-for="div in divisionOptions"
+                        :key="div"
+                        @click="selectEditDivision(div)"
+                        class="flex items-center justify-between px-4 py-2.5 text-sm rounded-xl transition-colors cursor-pointer"
+                        :class="editForm.division === div
+                          ? 'bg-teal-50 text-teal-700 font-semibold'
+                          : 'text-slate-700 hover:bg-teal-50/70 hover:text-teal-700 font-medium'"
+                      >
+                        <div class="flex items-center gap-2.5 truncate">
+                          <span
+                            v-if="editForm.division === div"
+                            class="w-1.5 h-1.5 rounded-full bg-[#008795] shrink-0"
+                          ></span>
+                          <span class="truncate">{{ div }}</span>
+                        </div>
+                        <svg
+                          v-if="editForm.division === div"
+                          class="w-4 h-4 text-[#008795] shrink-0 ml-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -848,7 +1041,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import axios from '../axiosInstance';
 
 // State
@@ -878,12 +1071,114 @@ const originalEditDivision = ref('');
 const originalEditDisplayOrder = ref(null);
 const isDisplayOrderManuallyOverridden = ref(false);
 
+// Custom Dropdown States & Refs
+const isDesignationDropdownOpen = ref(false);
+const isDivisionDropdownOpen = ref(false);
+const isEditDesignationDropdownOpen = ref(false);
+const isEditDivisionDropdownOpen = ref(false);
+
+const designationDropdownRef = ref(null);
+const divisionDropdownRef = ref(null);
+const editDesignationDropdownRef = ref(null);
+const editDivisionDropdownRef = ref(null);
+
+const designationOptions = [
+  'Director General',
+  'Additional Director General',
+  'Director',
+  'Director (Acting)',
+  'Deputy Director',
+  'Assistant Director',
+  'Director Admin',
+  'Director Finance',
+  'Deputy Director Finance',
+  'Development Officer',
+  'Chief Management Service Officer'
+];
+
 const divisionOptions = [
   'Executive Directorate',
   'Financial Solution',
   'Market Access & Development',
   'Admin and Accounts'
 ];
+
+// Backward compatibility: If an official has a legacy or custom designation, keep it available in the edit list
+const editDesignationOptions = computed(() => {
+  const current = (editForm.value.designation || '').trim();
+  if (current && !designationOptions.some(d => d.toLowerCase() === current.toLowerCase())) {
+    return [current, ...designationOptions];
+  }
+  return designationOptions;
+});
+
+// Dropdown Toggle Handlers
+const toggleDesignationDropdown = () => {
+  isDesignationDropdownOpen.value = !isDesignationDropdownOpen.value;
+  if (isDesignationDropdownOpen.value) {
+    isDivisionDropdownOpen.value = false;
+  }
+};
+
+const toggleDivisionDropdown = () => {
+  isDivisionDropdownOpen.value = !isDivisionDropdownOpen.value;
+  if (isDivisionDropdownOpen.value) {
+    isDesignationDropdownOpen.value = false;
+  }
+};
+
+const toggleEditDesignationDropdown = () => {
+  isEditDesignationDropdownOpen.value = !isEditDesignationDropdownOpen.value;
+  if (isEditDesignationDropdownOpen.value) {
+    isEditDivisionDropdownOpen.value = false;
+  }
+};
+
+const toggleEditDivisionDropdown = () => {
+  isEditDivisionDropdownOpen.value = !isEditDivisionDropdownOpen.value;
+  if (isEditDivisionDropdownOpen.value) {
+    isEditDesignationDropdownOpen.value = false;
+  }
+};
+
+// Selection Handlers
+const selectDesignation = (role) => {
+  form.value.designation = role;
+  isDesignationDropdownOpen.value = false;
+};
+
+const selectDivision = (div) => {
+  form.value.division = div;
+  isDivisionDropdownOpen.value = false;
+  handleDivisionChange();
+};
+
+const selectEditDesignation = (role) => {
+  editForm.value.designation = role;
+  isEditDesignationDropdownOpen.value = false;
+};
+
+const selectEditDivision = (div) => {
+  editForm.value.division = div;
+  isEditDivisionDropdownOpen.value = false;
+  handleEditDivisionChange();
+};
+
+// Close dropdowns on outside click
+const handleClickOutside = (e) => {
+  if (designationDropdownRef.value && !designationDropdownRef.value.contains(e.target)) {
+    isDesignationDropdownOpen.value = false;
+  }
+  if (divisionDropdownRef.value && !divisionDropdownRef.value.contains(e.target)) {
+    isDivisionDropdownOpen.value = false;
+  }
+  if (editDesignationDropdownRef.value && !editDesignationDropdownRef.value.contains(e.target)) {
+    isEditDesignationDropdownOpen.value = false;
+  }
+  if (editDivisionDropdownRef.value && !editDivisionDropdownRef.value.contains(e.target)) {
+    isEditDivisionDropdownOpen.value = false;
+  }
+};
 
 // Helper: Calculate next display order for a division (highest displayOrder + 1, or 1 if none)
 const calculateNextDisplayOrder = (division, excludeId = null) => {
@@ -1071,6 +1366,8 @@ const handleCreate = async () => {
 
   isSubmitting.value = true;
   errorMessage.value = '';
+  isDesignationDropdownOpen.value = false;
+  isDivisionDropdownOpen.value = false;
 
   try {
     const selectedDivision = form.value.division;
@@ -1119,6 +1416,8 @@ const handleCreate = async () => {
 
 const openEditModal = (member) => {
   editErrorMessage.value = '';
+  isEditDesignationDropdownOpen.value = false;
+  isEditDivisionDropdownOpen.value = false;
   originalEditDivision.value = member.division || 'Financial Solution';
   const savedOrder = (member.displayOrder !== null && member.displayOrder !== undefined && member.displayOrder !== '')
     ? Number(member.displayOrder)
@@ -1146,6 +1445,8 @@ const openEditModal = (member) => {
 const closeEditModal = (force = false) => {
   if (isUpdating.value && !force) return;
   isEditModalOpen.value = false;
+  isEditDesignationDropdownOpen.value = false;
+  isEditDivisionDropdownOpen.value = false;
   editErrorMessage.value = '';
   originalEditDivision.value = '';
   originalEditDisplayOrder.value = null;
@@ -1160,6 +1461,8 @@ const handleUpdate = async () => {
 
   isUpdating.value = true;
   editErrorMessage.value = '';
+  isEditDesignationDropdownOpen.value = false;
+  isEditDivisionDropdownOpen.value = false;
 
   try {
     const finalDisplayOrder = Number(editForm.value.displayOrder) > 0
@@ -1225,6 +1528,11 @@ const confirmDelete = async () => {
 
 onMounted(() => {
   fetchTeamMembers();
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
