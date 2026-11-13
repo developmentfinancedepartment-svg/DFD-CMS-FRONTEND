@@ -153,6 +153,7 @@
                 </div>
                 <select
                   v-model="form.division"
+                  @change="handleDivisionChange"
                   required
                   class="w-full pl-10 pr-8 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
                 >
@@ -193,6 +194,7 @@
                   </div>
                   <input
                     v-model.number="form.displayOrder"
+                    @input="isDisplayOrderManuallyOverridden = true"
                     type="number"
                     min="1"
                     placeholder="1"
@@ -601,6 +603,7 @@
                   </div>
                   <select
                     v-model="editForm.division"
+                    @change="handleEditDivisionChange"
                     required
                     class="w-full pl-10 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium appearance-none cursor-pointer"
                   >
@@ -845,7 +848,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import axios from '../axiosInstance';
 
 // State
@@ -869,6 +872,11 @@ const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
 
 const isEditModalOpen = ref(false);
+const isEditing = computed(() => isEditModalOpen.value);
+
+const originalEditDivision = ref('');
+const originalEditDisplayOrder = ref(null);
+const isDisplayOrderManuallyOverridden = ref(false);
 
 const divisionOptions = [
   'Executive Directorate',
@@ -877,11 +885,39 @@ const divisionOptions = [
   'Admin and Accounts'
 ];
 
+// Helper: Calculate next display order for a division (highest displayOrder + 1, or 1 if none)
+const calculateNextDisplayOrder = (division, excludeId = null) => {
+  if (!division) return 1;
+
+  const targetDiv = division.trim().toLowerCase();
+  const officialsInDivision = teamMembers.value.filter((m) => {
+    if (excludeId && m.id === excludeId) return false;
+    return (m.division || '').trim().toLowerCase() === targetDiv;
+  });
+
+  if (!officialsInDivision.length) return 1;
+
+  const validOrders = officialsInDivision
+    .map((m) => {
+      if (m.displayOrder === null || m.displayOrder === undefined || m.displayOrder === '') {
+        return null;
+      }
+      const num = Number(m.displayOrder);
+      return Number.isFinite(num) && num > 0 ? num : null;
+    })
+    .filter((order) => order !== null);
+
+  if (!validOrders.length) return 1;
+
+  const maxOrder = Math.max(...validOrders);
+  return maxOrder + 1;
+};
+
 // Form state
-const initialForm = () => ({
+const initialForm = (defaultDivision = 'Financial Solution') => ({
   name: '',
   designation: '',
-  division: 'Financial Solution',
+  division: defaultDivision,
   room: '',
   description: '',
   officePhone: '',
@@ -890,7 +926,7 @@ const initialForm = () => ({
   fax: '',
   primaryEmail: '',
   secondaryEmail: '',
-  displayOrder: 10
+  displayOrder: calculateNextDisplayOrder(defaultDivision)
 });
 
 const form = ref(initialForm());
@@ -908,10 +944,35 @@ const initialEditForm = () => ({
   fax: '',
   primaryEmail: '',
   secondaryEmail: '',
-  displayOrder: 10
+  displayOrder: 1
 });
 
 const editForm = ref(initialEditForm());
+
+// Division change handlers
+const handleDivisionChange = () => {
+  isDisplayOrderManuallyOverridden.value = false;
+  form.value.displayOrder = calculateNextDisplayOrder(form.value.division);
+};
+
+// Watch division changes on Add form to always update displayOrder unless manually overridden
+watch(
+  () => form.value.division,
+  (newDivision, oldDivision) => {
+    if (newDivision && newDivision !== oldDivision) {
+      isDisplayOrderManuallyOverridden.value = false;
+      form.value.displayOrder = calculateNextDisplayOrder(newDivision);
+    }
+  }
+);
+
+const handleEditDivisionChange = () => {
+  if (editForm.value.division === originalEditDivision.value) {
+    editForm.value.displayOrder = originalEditDisplayOrder.value;
+  } else {
+    editForm.value.displayOrder = calculateNextDisplayOrder(editForm.value.division, editForm.value.id);
+  }
+};
 
 // Notifications
 const showSuccess = (msg) => {
@@ -988,6 +1049,12 @@ const fetchTeamMembers = async () => {
     } else if (res.data && Array.isArray(res.data.members)) {
       teamMembers.value = res.data.members;
     }
+    teamMembers.value.sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
+
+    // Update Add form's display order on initial load or data refresh if not manually overridden
+    if (!isDisplayOrderManuallyOverridden.value) {
+      form.value.displayOrder = calculateNextDisplayOrder(form.value.division);
+    }
   } catch (error) {
     console.error('Failed to fetch team members:', error);
     errorMessage.value = 'Failed to load team directory. Please check backend connection.';
@@ -1006,10 +1073,15 @@ const handleCreate = async () => {
   errorMessage.value = '';
 
   try {
+    const selectedDivision = form.value.division;
+    const finalDisplayOrder = Number(form.value.displayOrder) > 0
+      ? Number(form.value.displayOrder)
+      : calculateNextDisplayOrder(selectedDivision);
+
     const payload = {
       name: form.value.name.trim(),
       designation: form.value.designation.trim(),
-      division: form.value.division,
+      division: selectedDivision,
       room: form.value.room ? form.value.room.trim() : null,
       description: form.value.description ? form.value.description.trim() : null,
       officePhone: form.value.officePhone ? form.value.officePhone.trim() : null,
@@ -1018,17 +1090,25 @@ const handleCreate = async () => {
       fax: form.value.fax ? form.value.fax.trim() : null,
       primaryEmail: form.value.primaryEmail ? form.value.primaryEmail.trim() : null,
       secondaryEmail: form.value.secondaryEmail ? form.value.secondaryEmail.trim() : null,
-      displayOrder: form.value.displayOrder || 10
+      displayOrder: finalDisplayOrder
     };
 
     const res = await axios.post('/api/v1/team-members', payload);
     if (res.data) {
       teamMembers.value.push(res.data);
-      teamMembers.value.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+      teamMembers.value.sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
     }
     showSuccess(`Official "${payload.name}" added successfully.`);
-    form.value = initialForm();
+    
+    // Clear form inputs, preserve the currently selected division, and calculate the next displayOrder for smooth back-to-back additions
+    isDisplayOrderManuallyOverridden.value = false;
+    form.value = {
+      ...initialForm(selectedDivision),
+      division: selectedDivision,
+      displayOrder: calculateNextDisplayOrder(selectedDivision)
+    };
     await fetchTeamMembers();
+    form.value.displayOrder = calculateNextDisplayOrder(form.value.division);
   } catch (error) {
     console.error('Failed to create team member:', error);
     errorMessage.value = error.response?.data?.message || 'Failed to save official to directory.';
@@ -1039,6 +1119,12 @@ const handleCreate = async () => {
 
 const openEditModal = (member) => {
   editErrorMessage.value = '';
+  originalEditDivision.value = member.division || 'Financial Solution';
+  const savedOrder = (member.displayOrder !== null && member.displayOrder !== undefined && member.displayOrder !== '')
+    ? Number(member.displayOrder)
+    : calculateNextDisplayOrder(originalEditDivision.value, member.id);
+  originalEditDisplayOrder.value = savedOrder;
+
   editForm.value = {
     id: member.id,
     name: member.name || '',
@@ -1052,7 +1138,7 @@ const openEditModal = (member) => {
     fax: member.fax || '',
     primaryEmail: member.primaryEmail || '',
     secondaryEmail: member.secondaryEmail || '',
-    displayOrder: member.displayOrder || 10
+    displayOrder: savedOrder
   };
   isEditModalOpen.value = true;
 };
@@ -1061,6 +1147,8 @@ const closeEditModal = (force = false) => {
   if (isUpdating.value && !force) return;
   isEditModalOpen.value = false;
   editErrorMessage.value = '';
+  originalEditDivision.value = '';
+  originalEditDisplayOrder.value = null;
   editForm.value = initialEditForm();
 };
 
@@ -1074,6 +1162,10 @@ const handleUpdate = async () => {
   editErrorMessage.value = '';
 
   try {
+    const finalDisplayOrder = Number(editForm.value.displayOrder) > 0
+      ? Number(editForm.value.displayOrder)
+      : (originalEditDisplayOrder.value || 1);
+
     const payload = {
       name: editForm.value.name.trim(),
       designation: editForm.value.designation.trim(),
@@ -1086,7 +1178,7 @@ const handleUpdate = async () => {
       fax: editForm.value.fax ? editForm.value.fax.trim() : null,
       primaryEmail: editForm.value.primaryEmail ? editForm.value.primaryEmail.trim() : null,
       secondaryEmail: editForm.value.secondaryEmail ? editForm.value.secondaryEmail.trim() : null,
-      displayOrder: editForm.value.displayOrder || 10
+      displayOrder: finalDisplayOrder
     };
 
     await axios.put(`/api/v1/team-members/${editForm.value.id}`, payload);
