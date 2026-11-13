@@ -1093,14 +1093,17 @@ const designationOptions = [
   'Director Finance',
   'Deputy Director Finance',
   'Development Officer',
-  'Chief Management Service Officer'
+  'Chief Management Service Officer',
+  'RTI Designated Officer',
+  'RTI Information Officer'
 ];
 
 const divisionOptions = [
   'Executive Directorate',
   'Financial Solution',
   'Market Access & Development',
-  'Admin and Accounts'
+  'Admin and Accounts',
+  'RTI'
 ];
 
 // Backward compatibility: If an official has a legacy or custom designation, keep it available in the edit list
