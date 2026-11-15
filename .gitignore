@@ -37,3 +37,4 @@ coverage
 # Vite build cache & temporary files
 vite.config.js.timestamp-*
 *.local
+node_modules

@@ -24,6 +24,10 @@
             <span class="text-slate-800 font-extrabold">{{ schemes.length }}</span>
             <span class="text-slate-300">•</span>
             <span class="text-emerald-600 font-extrabold">{{ activeCount }} Active</span>
+            <span class="text-slate-300">•</span>
+            <span class="text-amber-600 font-extrabold">{{ comingSoonCount }} Coming Soon</span>
+            <span class="text-slate-300">•</span>
+            <span class="text-slate-500 font-extrabold">{{ draftCount }} Draft</span>
           </div>
 
           <button
@@ -76,8 +80,8 @@
               class="px-3.5 py-2.5 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#008795] focus:border-[#008795] outline-none transition text-slate-700"
             >
               <option value="ALL">All Types</option>
-              <option value="LOAN">Loan Schemes</option>
-              <option value="SERVICE">Institutional Services</option>
+              <option value="LOAN">Loan Schemes (LOAN)</option>
+              <option value="SERVICE">Non-Loan Facilities (OTHER)</option>
             </select>
           </div>
 
@@ -145,12 +149,12 @@
                     <div
                       :class="[
                         'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm text-white',
-                        scheme.schemeType === 'SERVICE'
-                          ? 'bg-gradient-to-br from-indigo-500 to-indigo-700'
+                        isOtherFacility(scheme)
+                          ? 'bg-gradient-to-br from-amber-500 to-amber-700'
                           : 'bg-gradient-to-br from-[#008795] to-[#006071]'
                       ]"
                     >
-                      <i :class="scheme.icon || (scheme.schemeType === 'SERVICE' ? 'fas fa-warehouse' : 'fas fa-hand-holding-usd')" class="text-sm"></i>
+                      <i :class="scheme.icon || (isOtherFacility(scheme) ? 'fas fa-warehouse' : 'fas fa-hand-holding-usd')" class="text-sm"></i>
                     </div>
                     <div class="min-w-0 flex-1">
                       <div class="font-bold text-slate-800 text-sm truncate" :title="scheme.title">
@@ -158,10 +162,10 @@
                       </div>
                       <div class="mt-0.5">
                         <span
-                          v-if="scheme.schemeType === 'SERVICE'"
-                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 uppercase tracking-wider whitespace-nowrap"
+                          v-if="isOtherFacility(scheme)"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 uppercase tracking-wider whitespace-nowrap"
                         >
-                          SERVICE
+                          OTHER
                         </span>
                         <span
                           v-else
@@ -214,25 +218,24 @@
                   </template>
                 </td>
 
-                <!-- 5. Status Pill with Dot -->
+                <!-- 5. Status Pill with 3 States -->
                 <td class="py-3.5 px-4 text-center whitespace-nowrap">
                   <button
-                    @click="toggleActiveStatus(scheme)"
-                    :title="scheme.active ? 'Click to deactivate' : 'Click to activate'"
+                    type="button"
+                    @click="cycleStatus(scheme)"
+                    :title="`Current: ${getSchemeStatus(scheme)}. Click to toggle status.`"
                     :class="[
-                      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all border',
-                      scheme.active
+                      'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all border shadow-2xs',
+                      getSchemeStatus(scheme) === 'ACTIVE'
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                        : 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                        : getSchemeStatus(scheme) === 'COMING_SOON'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                        : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
                     ]"
                   >
-                    <span
-                      :class="[
-                        'h-1.5 w-1.5 rounded-full shrink-0',
-                        scheme.active ? 'bg-emerald-500 shadow-[0_0_5px_#10b981]' : 'bg-rose-500'
-                      ]"
-                    ></span>
-                    {{ scheme.active ? 'Active' : 'Inactive' }}
+                    <span v-if="getSchemeStatus(scheme) === 'ACTIVE'">🟢 Active</span>
+                    <span v-else-if="getSchemeStatus(scheme) === 'COMING_SOON'">🟡 Coming Soon</span>
+                    <span v-else>⚪ Draft</span>
                   </button>
                 </td>
 
@@ -419,8 +422,13 @@
                   <i class="fas fa-hand-holding-usd text-base"></i>
                 </div>
                 <div>
-                  <div class="text-sm font-bold" :class="form.schemeType === 'LOAN' ? 'text-[#007c91]' : 'text-slate-800'">
-                    Concessionary Loan Scheme
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold" :class="form.schemeType === 'LOAN' ? 'text-[#007c91]' : 'text-slate-800'">
+                      Concessionary Loan Scheme
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200 uppercase tracking-wider">
+                      LOAN
+                    </span>
                   </div>
                   <div class="text-xs text-slate-500 mt-0.5">
                     Borrower financing, interest subsidies, refinancing &amp; credit lines
@@ -433,7 +441,7 @@
                 @click="setSchemeType('SERVICE')"
                 :class="[
                   'flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-all',
-                  form.schemeType === 'SERVICE'
+                  isOtherFacility(form)
                     ? 'bg-amber-50/70 border-amber-500 ring-2 ring-amber-500/20 shadow-sm'
                     : 'bg-white border-slate-200 hover:border-slate-300'
                 ]"
@@ -441,14 +449,19 @@
                 <div
                   :class="[
                     'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-colors',
-                    form.schemeType === 'SERVICE' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'
+                    isOtherFacility(form) ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600'
                   ]"
                 >
                   <i class="fas fa-warehouse text-base"></i>
                 </div>
                 <div>
-                  <div class="text-sm font-bold" :class="form.schemeType === 'SERVICE' ? 'text-amber-800' : 'text-slate-800'">
-                    Institutional Service / Program
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold" :class="isOtherFacility(form) ? 'text-amber-800' : 'text-slate-800'">
+                      Institutional Service / Program
+                    </span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 uppercase tracking-wider">
+                      OTHER
+                    </span>
                   </div>
                   <div class="text-xs text-slate-500 mt-0.5">
                     Grain preservation centers, silos &amp; non-loan development services
@@ -937,17 +950,97 @@
             </div>
           </div>
 
-          <!-- 6. PUBLISH / ACTIVE STATUS -->
-          <div class="flex items-center gap-2 pt-1">
-            <input
-              id="scheme-active-check"
-              v-model="form.active"
-              type="checkbox"
-              class="w-4 h-4 text-[#008795] rounded border-slate-300 focus:ring-[#008795]"
-            />
-            <label for="scheme-active-check" class="text-sm font-semibold text-slate-700">
-              Active (Visible immediately on Public Services &amp; Schemes directory)
-            </label>
+          <!-- 6. PUBLISH / 3-STATE STATUS SELECTOR -->
+          <div class="space-y-2 pt-1">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Publication Status *
+              </label>
+              <span class="text-[11px] text-slate-400 font-medium">Controls public portal visibility &amp; action state</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- ACTIVE -->
+              <label
+                :class="[
+                  'relative flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all',
+                  form.status === 'ACTIVE'
+                    ? 'bg-emerald-50/70 border-emerald-500 ring-2 ring-emerald-500/20 shadow-sm'
+                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                ]"
+              >
+                <input
+                  type="radio"
+                  name="scheme-status"
+                  v-model="form.status"
+                  value="ACTIVE"
+                  class="sr-only"
+                />
+                <span class="text-lg leading-none mt-0.5 select-none">🟢</span>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold" :class="form.status === 'ACTIVE' ? 'text-emerald-800' : 'text-slate-800'">
+                    Active
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                    Published &amp; clickable on public portal
+                  </div>
+                </div>
+              </label>
+
+              <!-- COMING_SOON -->
+              <label
+                :class="[
+                  'relative flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all',
+                  form.status === 'COMING_SOON'
+                    ? 'bg-amber-50/70 border-amber-500 ring-2 ring-amber-500/20 shadow-sm'
+                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                ]"
+              >
+                <input
+                  type="radio"
+                  name="scheme-status"
+                  v-model="form.status"
+                  value="COMING_SOON"
+                  class="sr-only"
+                />
+                <span class="text-lg leading-none mt-0.5 select-none">🟡</span>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold" :class="form.status === 'COMING_SOON' ? 'text-amber-800' : 'text-slate-800'">
+                    Coming Soon
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                    Upcoming teaser &amp; non-clickable details
+                  </div>
+                </div>
+              </label>
+
+              <!-- DRAFT -->
+              <label
+                :class="[
+                  'relative flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all',
+                  form.status === 'DRAFT'
+                    ? 'bg-slate-100/90 border-slate-400 ring-2 ring-slate-400/20 shadow-sm'
+                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                ]"
+              >
+                <input
+                  type="radio"
+                  name="scheme-status"
+                  v-model="form.status"
+                  value="DRAFT"
+                  class="sr-only"
+                />
+                <span class="text-lg leading-none mt-0.5 select-none">⚪</span>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-bold" :class="form.status === 'DRAFT' ? 'text-slate-800' : 'text-slate-700'">
+                    Draft
+                  </div>
+                  <div class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                    Hidden from public portal
+                  </div>
+                </div>
+              </label>
+            </div>
           </div>
 
           <!-- ACTIONS -->
@@ -1102,14 +1195,32 @@ const defaultForm = () => ({
   participatingBanks: '',
   description: '',
   icon: 'fas fa-hand-holding-usd',
+  status: 'ACTIVE',
   active: true
 });
 
 const form = ref(defaultForm());
 
+// Helper to determine normalized 3-state status with backward compatibility
+const getSchemeStatus = (scheme) => {
+  if (!scheme) return 'ACTIVE';
+  if (scheme.status && typeof scheme.status === 'string') {
+    const s = scheme.status.trim().toUpperCase();
+    if (['ACTIVE', 'COMING_SOON', 'DRAFT'].includes(s)) return s;
+  }
+  return scheme.active !== false ? 'ACTIVE' : 'DRAFT';
+};
+
+// Helper to determine if an entry is a non-loan institutional facility (OTHER)
+const isOtherFacility = (scheme) => {
+  if (!scheme) return false;
+  const t = (scheme.schemeType || '').toUpperCase();
+  return t === 'SERVICE' || t === 'OTHER';
+};
+
 const setSchemeType = (type) => {
   form.value.schemeType = type;
-  if (type === 'SERVICE') {
+  if (type === 'SERVICE' || type === 'OTHER') {
     if (form.value.icon === 'fas fa-hand-holding-usd') {
       form.value.icon = 'fas fa-warehouse';
     }
@@ -1124,7 +1235,9 @@ const setSchemeType = (type) => {
 };
 
 // Computed Stats
-const activeCount = computed(() => schemes.value.filter(s => s.active).length);
+const activeCount = computed(() => schemes.value.filter(s => getSchemeStatus(s) === 'ACTIVE').length);
+const comingSoonCount = computed(() => schemes.value.filter(s => getSchemeStatus(s) === 'COMING_SOON').length);
+const draftCount = computed(() => schemes.value.filter(s => getSchemeStatus(s) === 'DRAFT').length);
 
 const customCategories = computed(() => {
   const standard = [
@@ -1161,8 +1274,12 @@ const filteredSchemes = computed(() => {
   return schemes.value.filter(scheme => {
     // 1. Type match
     if (selectedTypeFilter.value !== 'ALL') {
-      const itemType = scheme.schemeType || 'LOAN';
-      if (itemType !== selectedTypeFilter.value) return false;
+      const isOther = isOtherFacility(scheme);
+      if (selectedTypeFilter.value === 'SERVICE' || selectedTypeFilter.value === 'OTHER') {
+        if (!isOther) return false;
+      } else if (selectedTypeFilter.value === 'LOAN') {
+        if (isOther) return false;
+      }
     }
 
     // 2. Category match
@@ -1404,7 +1521,8 @@ const openEditModal = (scheme) => {
     participatingBanks: scheme.participatingBanks || '',
     description: scheme.description || '',
     icon: scheme.icon || (scheme.schemeType === 'SERVICE' ? 'fas fa-warehouse' : 'fas fa-hand-holding-usd'),
-    active: Boolean(scheme.active)
+    status: getSchemeStatus(scheme),
+    active: getSchemeStatus(scheme) !== 'DRAFT'
   };
   showModal.value = true;
 };
@@ -1449,10 +1567,14 @@ const saveScheme = async () => {
     }
 
     // Default financial terms for non-loan institutional services
-    if (payload.schemeType === 'SERVICE') {
+    if (isOtherFacility(payload)) {
       if (!payload.maxAmount) payload.maxAmount = 'N/A';
       if (!payload.interestRate) payload.interestRate = 'N/A';
     }
+
+    // Ensure status and active synchronization
+    payload.status = form.value.status || (form.value.active !== false ? 'ACTIVE' : 'DRAFT');
+    payload.active = payload.status !== 'DRAFT';
 
     if (isEdit.value && editingId.value !== null) {
       await axios.put(`/api/v1/services/${editingId.value}`, payload);
@@ -1467,18 +1589,25 @@ const saveScheme = async () => {
   }
 };
 
-const toggleActiveStatus = async (scheme) => {
+const cycleStatus = async (scheme) => {
+  const current = getSchemeStatus(scheme);
+  const next = current === 'ACTIVE' ? 'COMING_SOON' : current === 'COMING_SOON' ? 'DRAFT' : 'ACTIVE';
   try {
     const updatedPayload = {
       ...scheme,
-      active: !scheme.active
+      status: next,
+      active: next !== 'DRAFT'
     };
     await axios.put(`/api/v1/services/${scheme.id}`, updatedPayload);
     await fetchSchemes();
   } catch (error) {
-    console.error('Failed to toggle scheme status:', error);
+    console.error('Failed to cycle scheme status:', error);
     alert('Failed to update scheme status.');
   }
+};
+
+const toggleActiveStatus = async (scheme) => {
+  await cycleStatus(scheme);
 };
 
 // Delete Modal Handlers
