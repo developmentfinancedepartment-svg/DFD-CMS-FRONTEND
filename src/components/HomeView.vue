@@ -137,7 +137,154 @@
         </router-link>
       </section>
 
-      <!-- 3. MAIN 2-COLUMN CONTENT GRID (70% / 30% SPLIT) -->
+      <!-- 3. HOMEPAGE KEY METRICS MANAGEMENT CARD -->
+      <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-5">
+        <!-- Header: Title, Subtitle, and Action Button -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100/80 flex items-center justify-center text-teal-600 shrink-0">
+              <i class="fas fa-chart-line text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                Homepage Key Metrics
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200/80">Public Banner</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Configure the 5 impact statistics displayed live on the public landing page banner
+              </p>
+            </div>
+          </div>
+
+          <!-- Update Button & Actions -->
+          <div class="flex items-center gap-3 shrink-0">
+            <button
+              @click="saveHomeMetrics"
+              :disabled="isSavingMetrics || isLoadingMetrics"
+              class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2.5 text-xs font-semibold shadow-sm transition-all hover:shadow cursor-pointer"
+            >
+              <i v-if="isSavingMetrics" class="fas fa-circle-notch fa-spin text-xs"></i>
+              <i v-else class="fas fa-save text-xs"></i>
+              <span>{{ isSavingMetrics ? 'Saving Changes...' : 'Update Homepage Metrics' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Notification Banner (Success / Error) -->
+        <div
+          v-if="metricsAlert.show"
+          class="p-3.5 rounded-xl text-xs font-medium flex items-center justify-between transition-all"
+          :class="metricsAlert.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80' : 'bg-rose-50 text-rose-800 border border-rose-200/80'"
+        >
+          <div class="flex items-center gap-2">
+            <i :class="metricsAlert.type === 'success' ? 'fas fa-check-circle text-emerald-600' : 'fas fa-exclamation-circle text-rose-600'"></i>
+            <span>{{ metricsAlert.message }}</span>
+          </div>
+          <button @click="metricsAlert.show = false" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+            <i class="fas fa-times text-xs"></i>
+          </button>
+        </div>
+
+        <!-- 5-Column Metrics Inputs Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Metric 1: Number of Refinance Beneficiaries -->
+          <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/70 hover:border-teal-300 focus-within:border-teal-500 focus-within:bg-white transition-all space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#008795] flex items-center justify-center text-xs shrink-0">
+                <i class="fas fa-users"></i>
+              </div>
+              <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate" title="Number of Refinance Beneficiaries">
+                Refinance Beneficiaries
+              </label>
+            </div>
+            <input
+              v-model="homeMetrics.refinanceBeneficiaries"
+              type="text"
+              placeholder="e.g. 25,400+"
+              class="w-full px-3 py-2 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+            />
+            <p class="text-[10px] text-slate-400">Position 1 • Refinance Beneficiaries</p>
+          </div>
+
+          <!-- Metric 2: Number of Interest Subsidies -->
+          <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/70 hover:border-teal-300 focus-within:border-teal-500 focus-within:bg-white transition-all space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#008795] flex items-center justify-center text-xs shrink-0">
+                <i class="fas fa-percentage"></i>
+              </div>
+              <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate" title="Number of Interest Subsidies">
+                Interest Subsidies
+              </label>
+            </div>
+            <input
+              v-model="homeMetrics.interestSubsidies"
+              type="text"
+              placeholder="e.g. 18,250+"
+              class="w-full px-3 py-2 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+            />
+            <p class="text-[10px] text-slate-400">Position 2 • Interest Subsidies</p>
+          </div>
+
+          <!-- Metric 3: Partner Banks -->
+          <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/70 hover:border-teal-300 focus-within:border-teal-500 focus-within:bg-white transition-all space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#008795] flex items-center justify-center text-xs shrink-0">
+                <i class="fas fa-landmark"></i>
+              </div>
+              <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate" title="Partner Banks">
+                Partner Banks
+              </label>
+            </div>
+            <input
+              v-model="homeMetrics.partnerBanks"
+              type="text"
+              placeholder="e.g. 14+"
+              class="w-full px-3 py-2 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+            />
+            <p class="text-[10px] text-slate-400">Position 3 • Partner Banks</p>
+          </div>
+
+          <!-- Metric 4: Active Loan Schemes -->
+          <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/70 hover:border-teal-300 focus-within:border-teal-500 focus-within:bg-white transition-all space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#008795] flex items-center justify-center text-xs shrink-0">
+                <i class="fas fa-file-invoice-dollar"></i>
+              </div>
+              <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate" title="Active Loan Schemes">
+                Active Loan Schemes
+              </label>
+            </div>
+            <input
+              v-model="homeMetrics.activeLoanSchemes"
+              type="text"
+              placeholder="e.g. 8+"
+              class="w-full px-3 py-2 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+            />
+            <p class="text-[10px] text-slate-400">Position 4 • Active Schemes</p>
+          </div>
+
+          <!-- Metric 5: Total Funds Disbursed -->
+          <div class="bg-slate-50/70 p-4 rounded-xl border border-slate-200/70 hover:border-teal-300 focus-within:border-teal-500 focus-within:bg-white transition-all space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-teal-50 text-[#008795] flex items-center justify-center text-xs shrink-0">
+                <i class="fas fa-coins"></i>
+              </div>
+              <label class="text-[11px] font-bold uppercase tracking-wider text-slate-500 truncate" title="Total Funds Disbursed">
+                Total Funds Disbursed
+              </label>
+            </div>
+            <input
+              v-model="homeMetrics.totalFundsDisbursed"
+              type="text"
+              placeholder="e.g. Rs. 4,850M+"
+              class="w-full px-3 py-2 text-sm font-bold text-slate-800 bg-white border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+            />
+            <p class="text-[10px] text-slate-400">Position 5 • Funds Disbursed</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. MAIN 2-COLUMN CONTENT GRID (70% / 30% SPLIT) -->
       <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- Left Column: Recent Publications & Activity (8 cols on lg) -->
@@ -386,6 +533,78 @@ const isLoadingStats = ref(true);
 const isLoadingPublications = ref(true);
 const recentPublications = ref([]);
 
+// Homepage Key Metrics Configuration State
+const homeMetrics = reactive({
+  refinanceBeneficiaries: '25,400+',
+  interestSubsidies: '18,250+',
+  partnerBanks: '14+',
+  activeLoanSchemes: '8+',
+  totalFundsDisbursed: 'Rs. 4,850M+'
+});
+
+const isLoadingMetrics = ref(false);
+const isSavingMetrics = ref(false);
+const metricsAlert = reactive({
+  show: false,
+  type: 'success',
+  message: ''
+});
+
+const fetchHomeMetrics = async () => {
+  isLoadingMetrics.value = true;
+  try {
+    const res = await axios.get('/api/public/home-stats');
+    if (res?.data) {
+      if (res.data.refinanceBeneficiaries) homeMetrics.refinanceBeneficiaries = res.data.refinanceBeneficiaries;
+      if (res.data.interestSubsidies) homeMetrics.interestSubsidies = res.data.interestSubsidies;
+      if (res.data.partnerBanks) homeMetrics.partnerBanks = res.data.partnerBanks;
+      if (res.data.activeLoanSchemes) homeMetrics.activeLoanSchemes = res.data.activeLoanSchemes;
+      const funds = res.data.totalFundsDisbursed || res.data.totalFundDisbursed;
+      if (funds) homeMetrics.totalFundsDisbursed = funds;
+    }
+  } catch (error) {
+    console.warn('Could not fetch home stats from backend, keeping default metrics:', error);
+  } finally {
+    isLoadingMetrics.value = false;
+  }
+};
+
+const saveHomeMetrics = async () => {
+  isSavingMetrics.value = true;
+  metricsAlert.show = false;
+  try {
+    const payload = {
+      refinanceBeneficiaries: homeMetrics.refinanceBeneficiaries,
+      interestSubsidies: homeMetrics.interestSubsidies,
+      partnerBanks: homeMetrics.partnerBanks,
+      activeLoanSchemes: homeMetrics.activeLoanSchemes,
+      totalFundsDisbursed: homeMetrics.totalFundsDisbursed,
+      totalFundDisbursed: homeMetrics.totalFundsDisbursed
+    };
+    const res = await axios.put('/api/admin/home-stats', payload);
+    if (res?.data) {
+      homeMetrics.refinanceBeneficiaries = res.data.refinanceBeneficiaries;
+      homeMetrics.interestSubsidies = res.data.interestSubsidies;
+      homeMetrics.partnerBanks = res.data.partnerBanks;
+      homeMetrics.activeLoanSchemes = res.data.activeLoanSchemes;
+      homeMetrics.totalFundsDisbursed = res.data.totalFundsDisbursed || res.data.totalFundDisbursed;
+    }
+    metricsAlert.show = true;
+    metricsAlert.type = 'success';
+    metricsAlert.message = 'Homepage Key Metrics successfully updated and saved!';
+    setTimeout(() => {
+      metricsAlert.show = false;
+    }, 4500);
+  } catch (error) {
+    console.error('Failed to update home stats:', error);
+    metricsAlert.show = true;
+    metricsAlert.type = 'error';
+    metricsAlert.message = 'Failed to update metrics. Please ensure you are logged in and backend is running.';
+  } finally {
+    isSavingMetrics.value = false;
+  }
+};
+
 // Format display dates cleanly (e.g. "Oct 12, 2026")
 const formatDate = (dateStr) => {
   if (!dateStr) return '—';
@@ -473,5 +692,6 @@ const loadDashboardData = async () => {
 
 onMounted(() => {
   loadDashboardData();
+  fetchHomeMetrics();
 });
 </script>
