@@ -13,20 +13,23 @@
             Manage Gallery
           </h1>
           <p class="text-slate-500 mt-1 text-sm">
-            Upload event photographs, field visit documentation, and institutional photo albums to the public portal.
+            Upload multi-photo event albums, field visit documentation, and institutional photo albums to the public portal.
           </p>
         </div>
 
         <!-- Metric KPI Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 w-full xl:w-auto">
-          <!-- Total Images -->
+          <!-- Total Albums & Photos -->
           <div class="flex items-center gap-3 px-4 py-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm">
             <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-[#008795] shrink-0">
               <i class="fas fa-images text-sm"></i>
             </div>
             <div>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Photos</p>
-              <span class="text-lg font-extrabold text-slate-900">{{ galleryItems.length }}</span>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Albums / Photos</p>
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-lg font-extrabold text-slate-900">{{ galleryItems.length }}</span>
+                <span class="text-xs font-semibold text-slate-400">({{ totalPhotosCount }} photos)</span>
+              </div>
             </div>
           </div>
 
@@ -89,15 +92,15 @@
       <!-- MAIN SPLIT GRID -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- 2. UPLOAD FORM CARD (5 cols) -->
+        <!-- 2. UPLOAD ALBUM FORM CARD (5 cols) -->
         <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 lg:p-7 shadow-sm sticky top-24">
           <div class="flex items-center gap-3 mb-6">
             <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-[#008795]">
               <i class="fas fa-camera text-base"></i>
             </div>
             <div>
-              <h2 class="text-lg font-bold text-slate-800">Upload Gallery Photo</h2>
-              <p class="text-xs text-slate-400">Post new photograph to POST /api/v1/gallery</p>
+              <h2 class="text-lg font-bold text-slate-800">Upload Event Album</h2>
+              <p class="text-xs text-slate-400">Post event photos (up to 10 photos) to POST /api/v1/gallery</p>
             </div>
           </div>
 
@@ -105,7 +108,7 @@
             <!-- Title -->
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Photo / Event Title <span class="text-rose-500">*</span>
+                Event / Album Title <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -209,17 +212,25 @@
               </VueDatePicker>
             </div>
 
-            <!-- Image File Input -->
+            <!-- Multiple Images Upload & Preview Grid -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Image File <span class="text-rose-500">*</span>
-              </label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Album Photos (1–10 Photos) <span class="text-rose-500">*</span>
+                </label>
+                <span class="text-[11px] font-bold" :class="selectedFiles.length >= 10 ? 'text-amber-600' : 'text-slate-400'">
+                  {{ selectedFiles.length }} / 10 photos
+                </span>
+              </div>
+
+              <!-- Drag and Drop Box -->
               <div
+                v-if="selectedFiles.length < 10"
                 @dragover.prevent="isDragging = true"
                 @dragleave.prevent="isDragging = false"
                 @drop.prevent="handleFileDrop"
                 :class="[
-                  'relative border-2 border-dashed rounded-2xl p-5 text-center transition-all cursor-pointer group',
+                  'relative border-2 border-dashed rounded-2xl p-4 text-center transition-all cursor-pointer group mb-3',
                   isDragging ? 'border-[#008795] bg-cyan-50/50' : 'border-slate-200 hover:border-[#008795] bg-slate-50/50 hover:bg-cyan-50/30'
                 ]"
                 @click="$refs.fileInput.click()"
@@ -227,45 +238,120 @@
                 <input
                   ref="fileInput"
                   type="file"
+                  multiple
                   accept="image/png, image/jpeg, image/jpg, image/webp"
                   @change="handleFileChange"
                   class="hidden"
                 />
 
-                <div v-if="previewUrl" class="space-y-2">
-                  <div class="relative w-full h-40 rounded-xl overflow-hidden border border-slate-200">
-                    <img :src="previewUrl" class="w-full h-full object-cover" alt="Preview" />
-                    <button
-                      type="button"
-                      @click.stop="removeSelectedFile"
-                      class="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-rose-600 text-white rounded-lg transition"
-                      title="Remove file"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                  </div>
-                  <p class="text-xs font-medium text-slate-600 truncate">{{ selectedFile?.name }}</p>
-                </div>
-
-                <div v-else class="space-y-2 py-3">
-                  <div class="w-12 h-12 mx-auto rounded-2xl bg-cyan-50 flex items-center justify-center text-[#008795] group-hover:scale-110 transition-transform">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                <div class="space-y-1.5 py-1">
+                  <div class="w-10 h-10 mx-auto rounded-xl bg-cyan-50 flex items-center justify-center text-[#008795] group-hover:scale-110 transition-transform">
+                    <i class="fas fa-images text-lg"></i>
                   </div>
                   <div>
-                    <span class="text-xs font-bold text-[#008795]">Click to upload</span>
+                    <span class="text-xs font-bold text-[#008795]">Click to select photos</span>
                     <span class="text-xs text-slate-500"> or drag and drop</span>
                   </div>
-                  <p class="text-[11px] text-slate-400">PNG, JPG, JPEG, WEBP up to 10MB</p>
+                  <p class="text-[11px] text-slate-400">Select multiple photos (PNG, JPG, WEBP up to 10MB each)</p>
                 </div>
+              </div>
+
+              <!-- Staged Photos Grid -->
+              <div v-if="selectedFiles.length > 0" class="space-y-2">
+                <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+                  <span class="font-semibold text-slate-700">Staged Album Photos:</span>
+                  <button
+                    type="button"
+                    @click="clearAllSelectedFiles"
+                    class="text-[11px] text-rose-500 hover:text-rose-700 font-bold transition"
+                  >
+                    Clear All
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-60 overflow-y-auto p-1 custom-scrollbar">
+                  <div
+                    v-for="(item, idx) in selectedFiles"
+                    :key="item.id"
+                    class="relative group rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs aspect-square"
+                  >
+                    <img :src="item.previewUrl" class="w-full h-full object-cover" :alt="item.file.name" />
+
+                    <!-- Cover Tag -->
+                    <span
+                      v-if="idx === 0"
+                      class="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-[#008795] text-white text-[9px] font-extrabold uppercase tracking-wider shadow-sm z-10"
+                    >
+                      Cover
+                    </span>
+                    <span
+                      v-else
+                      class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-bold z-10"
+                    >
+                      #{{ idx + 1 }}
+                    </span>
+
+                    <!-- Overlay Controls on Hover -->
+                    <div class="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-1.5 text-white">
+                      <div class="flex justify-end gap-1">
+                        <button
+                          type="button"
+                          @click.stop="removeSelectedFileAt(idx)"
+                          class="p-1 rounded bg-rose-600/90 hover:bg-rose-600 text-white transition"
+                          title="Remove photo"
+                        >
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+
+                      <div class="flex items-center justify-between gap-1">
+                        <!-- Move Left / Move Right -->
+                        <div class="flex items-center gap-1">
+                          <button
+                            type="button"
+                            :disabled="idx === 0"
+                            @click.stop="moveSelectedFile(idx, -1)"
+                            class="p-1 rounded bg-white/20 hover:bg-white/40 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Move left"
+                          >
+                            <i class="fas fa-chevron-left text-[9px]"></i>
+                          </button>
+                          <button
+                            type="button"
+                            :disabled="idx === selectedFiles.length - 1"
+                            @click.stop="moveSelectedFile(idx, 1)"
+                            class="p-1 rounded bg-white/20 hover:bg-white/40 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="Move right"
+                          >
+                            <i class="fas fa-chevron-right text-[9px]"></i>
+                          </button>
+                        </div>
+
+                        <!-- Set as Cover button if not first -->
+                        <button
+                          v-if="idx !== 0"
+                          type="button"
+                          @click.stop="makeCoverFile(idx)"
+                          class="px-1.5 py-0.5 rounded bg-[#008795] text-[9px] font-bold hover:bg-[#009fb0] transition"
+                          title="Set as Cover Photo"
+                        >
+                          Set Cover
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-[11px] text-slate-400">
+                  <i class="fas fa-info-circle text-[#008795] me-1"></i>
+                  The first photo (#1) will be used as the album's primary cover thumbnail.
+                </p>
               </div>
             </div>
 
             <!-- Submit Button -->
             <button
               type="submit"
-              :disabled="uploading || !selectedFile"
+              :disabled="uploading || selectedFiles.length === 0"
               class="w-full mt-2 inline-flex items-center justify-center gap-2.5 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#008795] to-[#006071] hover:from-[#009fb0] hover:to-[#007c91] text-white text-sm font-bold shadow-lg shadow-cyan-900/15 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
               <svg v-if="uploading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -273,12 +359,14 @@
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
               </svg>
               <i v-else class="fas fa-cloud-upload-alt"></i>
-              <span>{{ uploading ? 'Uploading Photograph...' : 'Publish to Gallery' }}</span>
+              <span>
+                {{ uploading ? 'Uploading Album...' : (selectedFiles.length > 1 ? `Publish ${selectedFiles.length}-Photo Album` : 'Publish to Gallery') }}
+              </span>
             </button>
           </form>
         </div>
 
-        <!-- 3. GALLERY CARDS LIST (7 cols) -->
+        <!-- 3. GALLERY ALBUM CARDS LIST (7 cols) -->
         <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 lg:p-7 shadow-sm flex flex-col">
           
           <!-- Filter & Search Bar (Static at top) -->
@@ -291,7 +379,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search photos..."
+                placeholder="Search event albums..."
                 class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-1 focus:ring-[#008795] outline-none transition text-slate-800"
               />
             </div>
@@ -322,7 +410,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
               </svg>
-              <p class="text-xs font-bold text-slate-600">Loading gallery photos...</p>
+              <p class="text-xs font-bold text-slate-600">Loading gallery albums...</p>
             </div>
 
             <!-- Empty State -->
@@ -330,8 +418,8 @@
               <div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
                 <i class="fas fa-images text-2xl"></i>
               </div>
-              <p class="text-sm font-bold text-slate-700">No gallery photos found</p>
-              <p class="text-xs text-slate-400 mt-1">Upload photos using the form on the left.</p>
+              <p class="text-sm font-bold text-slate-700">No gallery albums found</p>
+              <p class="text-xs text-slate-400 mt-1">Upload event photos using the form on the left.</p>
             </div>
 
             <!-- Cards Grid -->
@@ -364,13 +452,21 @@
                     {{ item.category }}
                   </span>
 
+                  <!-- Photo count badge -->
+                  <span
+                    class="absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-slate-900/85 backdrop-blur-md text-white text-[10px] font-extrabold tracking-wide flex items-center gap-1.5 shadow-md border border-white/20"
+                  >
+                    <i class="fas fa-images text-[10px] text-cyan-400"></i>
+                    <span>{{ getItemPhotos(item).length }} {{ getItemPhotos(item).length === 1 ? 'Photo' : 'Photos' }}</span>
+                  </span>
+
                   <!-- Action buttons: Edit & Delete -->
                   <div class="absolute top-3 right-3 flex items-center gap-1.5 z-10">
                     <button
                       type="button"
                       @click.stop="openEditModal(item)"
-                      class="w-8 h-8 rounded-lg bg-white/95 hover:bg-[#008795] text-slate-600 hover:text-white transition-colors flex items-center justify-center"
-                      title="Edit Photo"
+                      class="w-8 h-8 rounded-lg bg-white/95 hover:bg-[#008795] text-slate-600 hover:text-white transition-colors flex items-center justify-center shadow-sm"
+                      title="Edit Album"
                     >
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -380,8 +476,8 @@
                     <button
                       type="button"
                       @click.stop="openDeleteModal(item)"
-                      class="w-8 h-8 rounded-lg bg-white/95 hover:bg-rose-600 text-slate-600 hover:text-white transition-colors flex items-center justify-center"
-                      title="Delete Photo"
+                      class="w-8 h-8 rounded-lg bg-white/95 hover:bg-rose-600 text-slate-600 hover:text-white transition-colors flex items-center justify-center shadow-sm"
+                      title="Delete Album"
                     >
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -405,15 +501,10 @@
                   <!-- Footer details -->
                   <div class="mt-3 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-400">
                     <span>ID: #{{ item.id }}</span>
-                    <a
-                      v-if="item.imageUrl"
-                      :href="resolveImageUrl(item.imageUrl)"
-                      target="_blank"
-                      class="text-[#008795] hover:underline font-semibold flex items-center gap-1"
-                    >
-                      <span>View full</span>
-                      <i class="fas fa-external-link-alt text-[9px]"></i>
-                    </a>
+                    <span class="font-semibold text-slate-600 flex items-center gap-1">
+                      <i class="fas fa-layer-group text-[10px] text-[#008795]"></i>
+                      <span>{{ getItemPhotos(item).length }} {{ getItemPhotos(item).length === 1 ? 'Photo' : 'Photos' }}</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -424,24 +515,22 @@
 
       </div>
 
-      <!-- EDIT PHOTO MODAL -->
+      <!-- EDIT ALBUM MODAL -->
       <div
         v-if="isEditModalOpen"
         @click.self="!isUpdating && closeEditModal()"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
       >
-        <div class="relative w-full max-w-lg rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-slate-100 my-8 transform transition-all animate-in fade-in zoom-in-95 duration-150">
+        <div class="relative w-full max-w-xl rounded-3xl bg-white p-6 sm:p-7 shadow-2xl border border-slate-100 my-8 transform transition-all animate-in fade-in zoom-in-95 duration-150">
           <!-- Header -->
           <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-[#008795]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
+                <i class="fas fa-edit text-base"></i>
               </div>
               <div>
-                <h3 class="text-lg font-bold text-slate-800">Edit Gallery Photo</h3>
-                <p class="text-xs text-slate-400">Update photo title, category, and date</p>
+                <h3 class="text-lg font-bold text-slate-800">Edit Event Album</h3>
+                <p class="text-xs text-slate-400">Update event title, category, date, and manage album photos</p>
               </div>
             </div>
             <button
@@ -475,7 +564,7 @@
             <!-- Title -->
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Photo / Event Title <span class="text-rose-500">*</span>
+                Event / Album Title <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -579,51 +668,112 @@
               </VueDatePicker>
             </div>
 
-            <!-- Current Image Preview / Optional Replacement Image -->
+            <!-- Album Photos Management in Edit Modal -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Photograph (Optional Replacement)
-              </label>
-              <div class="flex items-center gap-3.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
-                <div class="w-16 h-16 rounded-xl overflow-hidden bg-slate-200 shrink-0 border border-slate-200">
-                  <img
-                    v-if="editPreviewUrl || editForm.imageUrl"
-                    :src="editPreviewUrl || resolveImageUrl(editForm.imageUrl)"
-                    class="w-full h-full object-cover"
-                    alt="Current photo"
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Album Photos ({{ editPhotos.length }} / 10) <span class="text-rose-500">*</span>
+                </label>
+                <label
+                  v-if="editPhotos.length < 10"
+                  class="text-xs font-bold text-[#008795] hover:text-[#006071] cursor-pointer inline-flex items-center gap-1.5 bg-cyan-50 px-2.5 py-1 rounded-lg border border-cyan-200/80 transition"
+                >
+                  <i class="fas fa-plus text-[10px]"></i>
+                  <span>Add Photos</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/png, image/jpeg, image/jpg, image/webp"
+                    @change="handleEditAddFiles"
+                    class="hidden"
                   />
-                  <div v-else class="w-full h-full flex items-center justify-center text-slate-400">
-                    <i class="fas fa-image text-lg"></i>
+                </label>
+              </div>
+
+              <!-- Grid of Edit Photos (both existing and newly added) -->
+              <div v-if="editPhotos.length > 0" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-56 overflow-y-auto p-2 custom-scrollbar bg-slate-50 rounded-2xl border border-slate-200/80">
+                <div
+                  v-for="(item, idx) in editPhotos"
+                  :key="item.id || idx"
+                  class="relative group rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs aspect-square"
+                >
+                  <img :src="item.previewUrl" class="w-full h-full object-cover" alt="Album photo" />
+
+                  <!-- Cover Badge -->
+                  <span
+                    v-if="idx === 0"
+                    class="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-[#008795] text-white text-[9px] font-extrabold uppercase tracking-wider shadow-sm z-10"
+                  >
+                    Cover
+                  </span>
+                  <span
+                    v-else
+                    class="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-bold z-10"
+                  >
+                    #{{ idx + 1 }}
+                  </span>
+
+                  <!-- New badge if newly added -->
+                  <span
+                    v-if="item.isNew"
+                    class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-bold z-10"
+                  >
+                    NEW
+                  </span>
+
+                  <!-- Hover Overlay Controls -->
+                  <div class="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-1 text-white">
+                    <div class="flex justify-end gap-1">
+                      <button
+                        type="button"
+                        @click.stop="removeEditPhotoAt(idx)"
+                        class="p-1 rounded bg-rose-600/90 hover:bg-rose-600 text-white transition"
+                        title="Remove photo from album"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-0.5">
+                      <div class="flex items-center gap-0.5">
+                        <button
+                          type="button"
+                          :disabled="idx === 0"
+                          @click.stop="moveEditPhoto(idx, -1)"
+                          class="p-1 rounded bg-white/20 hover:bg-white/40 disabled:opacity-30 disabled:cursor-not-allowed"
+                          title="Move left"
+                        >
+                          <i class="fas fa-chevron-left text-[8px]"></i>
+                        </button>
+                        <button
+                          type="button"
+                          :disabled="idx === editPhotos.length - 1"
+                          @click.stop="moveEditPhoto(idx, 1)"
+                          class="p-1 rounded bg-white/20 hover:bg-white/40 disabled:opacity-30 disabled:cursor-not-allowed"
+                          title="Move right"
+                        >
+                          <i class="fas fa-chevron-right text-[8px]"></i>
+                        </button>
+                      </div>
+
+                      <button
+                        v-if="idx !== 0"
+                        type="button"
+                        @click.stop="makeEditCover(idx)"
+                        class="px-1 py-0.5 rounded bg-[#008795] text-[8px] font-bold hover:bg-[#009fb0] transition"
+                        title="Set as Cover"
+                      >
+                        Cover
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-bold text-slate-700 truncate">
-                    {{ editSelectedFile ? editSelectedFile.name : 'Current Image' }}
-                  </p>
-                  <p class="text-[11px] text-slate-400">
-                    {{ editSelectedFile ? 'New photo will replace current' : 'Leave empty to keep existing photograph' }}
-                  </p>
-                  <div class="mt-2 flex items-center gap-2">
-                    <label class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-slate-700 hover:border-[#008795] hover:text-[#008795] cursor-pointer transition shadow-xs">
-                      <i class="fas fa-camera text-[10px]"></i>
-                      <span>{{ editSelectedFile ? 'Change photo' : 'Upload new photo' }}</span>
-                      <input
-                        type="file"
-                        accept="image/png, image/jpeg, image/jpg, image/webp"
-                        @change="handleEditFileChange"
-                        class="hidden"
-                      />
-                    </label>
-                    <button
-                      v-if="editSelectedFile"
-                      type="button"
-                      @click="removeEditSelectedFile"
-                      class="text-[11px] text-rose-500 hover:text-rose-700 font-semibold transition"
-                    >
-                      Revert
-                    </button>
-                  </div>
-                </div>
+              </div>
+
+              <!-- Empty state if all photos removed -->
+              <div v-else class="p-5 text-center bg-slate-50 rounded-2xl border border-dashed border-rose-300">
+                <p class="text-xs font-bold text-rose-600">All photos removed!</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Please add at least 1 photo for this album.</p>
               </div>
             </div>
 
@@ -639,7 +789,7 @@
               </button>
               <button
                 type="submit"
-                :disabled="isUpdating"
+                :disabled="isUpdating || editPhotos.length === 0"
                 class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#008795] to-[#006071] hover:from-[#009fb0] hover:to-[#007c91] text-white text-sm font-bold shadow-md shadow-cyan-900/15 transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 <svg v-if="isUpdating" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -647,7 +797,7 @@
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
                 <i v-else class="fas fa-check"></i>
-                <span>{{ isUpdating ? 'Saving Changes...' : 'Save Changes' }}</span>
+                <span>{{ isUpdating ? 'Saving Album...' : 'Save Album' }}</span>
               </button>
             </div>
           </form>
@@ -672,21 +822,23 @@
             </div>
 
             <h3 class="text-xl font-extrabold tracking-tight text-white">
-              Delete Gallery Photo?
+              Delete Gallery Album?
             </h3>
             <p class="mt-2 text-sm text-cyan-100/70 leading-relaxed">
-              Are you sure you want to permanently delete this photograph? This will remove the image file and database record.
+              Are you sure you want to permanently delete this event album? This will remove all image files and database records.
             </p>
 
             <div v-if="itemToDelete" class="mt-4 w-full p-3.5 rounded-2xl bg-[#001f24] border border-cyan-500/20 flex items-center gap-3 text-left">
               <img
                 v-if="itemToDelete.imageUrl"
                 :src="resolveImageUrl(itemToDelete.imageUrl)"
-                class="w-12 h-12 rounded-xl object-cover border border-cyan-500/30"
+                class="w-12 h-12 rounded-xl object-cover border border-cyan-500/30 shrink-0"
               />
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-bold text-white truncate">{{ itemToDelete.title }}</p>
-                <p class="text-xs text-cyan-300">{{ itemToDelete.category }} • {{ itemToDelete.eventDate }}</p>
+                <p class="text-xs text-cyan-300">
+                  {{ itemToDelete.category }} • {{ getItemPhotos(itemToDelete).length }} photos
+                </p>
               </div>
             </div>
 
@@ -769,6 +921,11 @@ onUnmounted(() => {
     successTimeout = null;
   }
   document.removeEventListener('click', handleClickOutside);
+  // Revoke object URLs on component unmount
+  clearAllSelectedFiles();
+  editPhotos.value.forEach(p => {
+    if (p.isNew && p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+  });
 });
 
 const errorMessage = ref('');
@@ -822,8 +979,8 @@ const form = ref({
 });
 const uploadForm = form;
 
-const selectedFile = ref(null);
-const previewUrl = ref('');
+// Selected files staging queue for Create (up to 10 photos)
+const selectedFiles = ref([]);
 
 const showDeleteModal = ref(false);
 const itemToDelete = ref(null);
@@ -833,8 +990,7 @@ const isEditModalOpen = ref(false);
 const showEditModal = isEditModalOpen;
 const isUpdating = ref(false);
 const editErrorMessage = ref('');
-const editSelectedFile = ref(null);
-const editPreviewUrl = ref('');
+const editPhotos = ref([]);
 
 const editForm = ref({
   id: null,
@@ -858,6 +1014,28 @@ const categoryBadgeClass = (category) => {
   }
 };
 
+// Robust helper to extract full list of photos for an item
+const getItemPhotos = (item) => {
+  if (!item) return [];
+  if (Array.isArray(item.images) && item.images.length > 0) {
+    return item.images;
+  }
+  if (typeof item.images === 'string' && item.images.trim()) {
+    try {
+      const parsed = JSON.parse(item.images);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch (e) {}
+    // If comma-separated
+    const split = item.images.split(',').map(s => s.trim()).filter(Boolean);
+    if (split.length > 0) return split;
+  }
+  return item.imageUrl ? [item.imageUrl] : [];
+};
+
+const totalPhotosCount = computed(() => {
+  return galleryItems.value.reduce((acc, item) => acc + getItemPhotos(item).length, 0);
+});
+
 const countCategory = (category) => {
   return galleryItems.value.filter(item => item.category === category).length;
 };
@@ -874,38 +1052,134 @@ const onImageError = (e) => {
   e.target.style.display = 'none';
 };
 
-// File handlers
+// File handlers for Create Album Form
 const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    processSelectedFile(file);
+  const files = Array.from(e.target.files || []);
+  if (files.length > 0) {
+    addFilesToSelection(files);
   }
+  // reset input so the same files can be chosen again if needed
+  e.target.value = '';
 };
 
 const handleFileDrop = (e) => {
   isDragging.value = false;
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    processSelectedFile(file);
+  const files = Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/'));
+  if (files.length > 0) {
+    addFilesToSelection(files);
   } else {
-    errorMessage.value = 'Please drop an image file (PNG, JPG, WEBP).';
+    errorMessage.value = 'Please drop valid image files (PNG, JPG, WEBP).';
   }
 };
 
-const processSelectedFile = (file) => {
-  selectedFile.value = file;
-  if (previewUrl.value) {
-    URL.revokeObjectURL(previewUrl.value);
+const addFilesToSelection = (files) => {
+  errorMessage.value = '';
+  const remainingSlots = 10 - selectedFiles.value.length;
+  if (remainingSlots <= 0) {
+    errorMessage.value = 'A maximum of 10 photos is allowed per event album.';
+    return;
   }
-  previewUrl.value = URL.createObjectURL(file);
+
+  const filesToAdd = files.slice(0, remainingSlots);
+  if (files.length > remainingSlots) {
+    errorMessage.value = `Only ${remainingSlots} more photo(s) could be added (max 10 photos per album).`;
+  }
+
+  for (const file of filesToAdd) {
+    if (!file.type.startsWith('image/')) continue;
+    if (file.size > 10 * 1024 * 1024) {
+      errorMessage.value = `File "${file.name}" exceeds the 10MB limit.`;
+      continue;
+    }
+    const previewUrl = URL.createObjectURL(file);
+    selectedFiles.value.push({
+      id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      file,
+      previewUrl
+    });
+  }
 };
 
-const removeSelectedFile = () => {
-  selectedFile.value = null;
-  if (previewUrl.value) {
-    URL.revokeObjectURL(previewUrl.value);
-    previewUrl.value = '';
+const removeSelectedFileAt = (index) => {
+  const item = selectedFiles.value[index];
+  if (item && item.previewUrl) {
+    URL.revokeObjectURL(item.previewUrl);
   }
+  selectedFiles.value.splice(index, 1);
+};
+
+const clearAllSelectedFiles = () => {
+  selectedFiles.value.forEach(item => {
+    if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+  });
+  selectedFiles.value = [];
+};
+
+const moveSelectedFile = (index, direction) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= selectedFiles.value.length) return;
+  const temp = selectedFiles.value[index];
+  selectedFiles.value[index] = selectedFiles.value[newIndex];
+  selectedFiles.value[newIndex] = temp;
+};
+
+const makeCoverFile = (index) => {
+  if (index <= 0 || index >= selectedFiles.value.length) return;
+  const [item] = selectedFiles.value.splice(index, 1);
+  selectedFiles.value.unshift(item);
+};
+
+// Edit Modal File Handlers
+const handleEditAddFiles = (e) => {
+  const files = Array.from(e.target.files || []);
+  if (files.length > 0) {
+    editErrorMessage.value = '';
+    const remainingSlots = 10 - editPhotos.value.length;
+    if (remainingSlots <= 0) {
+      editErrorMessage.value = 'A maximum of 10 photos is allowed per event album.';
+      return;
+    }
+
+    const filesToAdd = files.slice(0, remainingSlots);
+    for (const file of filesToAdd) {
+      if (!file.type.startsWith('image/')) continue;
+      if (file.size > 10 * 1024 * 1024) {
+        editErrorMessage.value = `File "${file.name}" exceeds the 10MB limit.`;
+        continue;
+      }
+      const previewUrl = URL.createObjectURL(file);
+      editPhotos.value.push({
+        id: `new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        isNew: true,
+        file,
+        previewUrl,
+        url: ''
+      });
+    }
+  }
+  e.target.value = '';
+};
+
+const removeEditPhotoAt = (index) => {
+  const item = editPhotos.value[index];
+  if (item && item.isNew && item.previewUrl) {
+    URL.revokeObjectURL(item.previewUrl);
+  }
+  editPhotos.value.splice(index, 1);
+};
+
+const moveEditPhoto = (index, direction) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= editPhotos.value.length) return;
+  const temp = editPhotos.value[index];
+  editPhotos.value[index] = editPhotos.value[newIndex];
+  editPhotos.value[newIndex] = temp;
+};
+
+const makeEditCover = (index) => {
+  if (index <= 0 || index >= editPhotos.value.length) return;
+  const [item] = editPhotos.value.splice(index, 1);
+  editPhotos.value.unshift(item);
 };
 
 // Filtering
@@ -941,10 +1215,10 @@ const fetchGallery = async () => {
   }
 };
 
-// Upload Photo
+// Upload Event Album
 const handleUpload = async () => {
-  if (!selectedFile.value) {
-    errorMessage.value = 'Please select an image file to upload.';
+  if (selectedFiles.value.length === 0) {
+    errorMessage.value = 'Please select at least 1 image file for this event album.';
     return;
   }
 
@@ -954,10 +1228,13 @@ const handleUpload = async () => {
 
   try {
     const formData = new FormData();
-    formData.append('title', form.value.title);
+    formData.append('title', form.value.title.trim());
     formData.append('category', form.value.category);
     formData.append('eventDate', form.value.eventDate);
-    formData.append('image', selectedFile.value);
+
+    selectedFiles.value.forEach(item => {
+      formData.append('images', item.file);
+    });
 
     await axios.post('/api/v1/gallery', formData, {
       headers: {
@@ -965,13 +1242,14 @@ const handleUpload = async () => {
       }
     });
 
-    showSuccess('Photograph uploaded to gallery successfully!');
+    const count = selectedFiles.value.length;
+    showSuccess(`Event album with ${count} photo${count > 1 ? 's' : ''} uploaded to gallery successfully!`);
     form.value.title = '';
-    removeSelectedFile();
+    clearAllSelectedFiles();
     await fetchGallery();
   } catch (error) {
-    console.error('Failed to upload gallery photo:', error);
-    errorMessage.value = 'Failed to upload photo. Please check file format and server connection.';
+    console.error('Failed to upload gallery album:', error);
+    errorMessage.value = 'Failed to upload album photos. Please check file format and server connection.';
   } finally {
     uploading.value = false;
   }
@@ -995,11 +1273,15 @@ const formatDateForInput = (dateStr) => {
 const openEditModal = (item) => {
   editErrorMessage.value = '';
   isEditCategoryOpen.value = false;
-  editSelectedFile.value = null;
-  if (editPreviewUrl.value) {
-    URL.revokeObjectURL(editPreviewUrl.value);
-    editPreviewUrl.value = '';
-  }
+
+  const photos = getItemPhotos(item);
+  editPhotos.value = photos.map((url, idx) => ({
+    id: `existing-${idx}-${Date.now()}`,
+    isNew: false,
+    url: url,
+    previewUrl: resolveImageUrl(url),
+    file: null
+  }));
 
   editForm.value = {
     id: item.id,
@@ -1016,11 +1298,11 @@ const closeEditModal = () => {
   isEditModalOpen.value = false;
   isEditCategoryOpen.value = false;
   editErrorMessage.value = '';
-  if (editPreviewUrl.value) {
-    URL.revokeObjectURL(editPreviewUrl.value);
-    editPreviewUrl.value = '';
-  }
-  editSelectedFile.value = null;
+
+  editPhotos.value.forEach(p => {
+    if (p.isNew && p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+  });
+  editPhotos.value = [];
   editForm.value = {
     id: null,
     title: '',
@@ -1030,28 +1312,9 @@ const closeEditModal = () => {
   };
 };
 
-const handleEditFileChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    editSelectedFile.value = file;
-    if (editPreviewUrl.value) {
-      URL.revokeObjectURL(editPreviewUrl.value);
-    }
-    editPreviewUrl.value = URL.createObjectURL(file);
-  }
-};
-
-const removeEditSelectedFile = () => {
-  editSelectedFile.value = null;
-  if (editPreviewUrl.value) {
-    URL.revokeObjectURL(editPreviewUrl.value);
-    editPreviewUrl.value = '';
-  }
-};
-
 const handleUpdate = async () => {
   if (!editForm.value.title?.trim()) {
-    editErrorMessage.value = 'Please provide a photo title.';
+    editErrorMessage.value = 'Please provide an album title.';
     return;
   }
   if (!editForm.value.category) {
@@ -1062,42 +1325,51 @@ const handleUpdate = async () => {
     editErrorMessage.value = 'Please select an event date.';
     return;
   }
+  if (editPhotos.value.length === 0) {
+    editErrorMessage.value = 'Please include at least 1 photograph in this album.';
+    return;
+  }
 
   isUpdating.value = true;
   editErrorMessage.value = '';
   errorMessage.value = '';
 
   try {
-    if (editSelectedFile.value) {
-      const formData = new FormData();
-      formData.append('title', editForm.value.title.trim());
-      formData.append('category', editForm.value.category);
-      formData.append('eventDate', editForm.value.eventDate);
-      formData.append('image', editSelectedFile.value);
+    const formData = new FormData();
+    formData.append('title', editForm.value.title.trim());
+    formData.append('category', editForm.value.category);
+    formData.append('eventDate', editForm.value.eventDate);
 
-      await axios.put(`/api/v1/gallery/${editForm.value.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-    } else {
-      await axios.put(`/api/v1/gallery/${editForm.value.id}`, {
-        title: editForm.value.title.trim(),
-        category: editForm.value.category,
-        eventDate: editForm.value.eventDate
-      });
+    // Retained existing photos (order is preserved)
+    const retainedExisting = editPhotos.value.filter(p => !p.isNew).map(p => p.url);
+    formData.append('existingImages', JSON.stringify(retainedExisting));
+
+    // Cover image indication if first photo is existing
+    if (editPhotos.value.length > 0 && !editPhotos.value[0].isNew) {
+      formData.append('coverImage', editPhotos.value[0].url);
     }
 
-    isEditModalOpen.value = false;
-    showSuccess('Gallery photo updated successfully!');
+    // Newly added photos
+    const newFiles = editPhotos.value.filter(p => p.isNew && p.file);
+    newFiles.forEach(item => {
+      formData.append('images', item.file);
+    });
+
+    await axios.put(`/api/v1/gallery/${editForm.value.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    showSuccess('Gallery event album updated successfully!');
     closeEditModal();
     await fetchGallery();
   } catch (error) {
-    console.error('Failed to update gallery photo:', error);
+    console.error('Failed to update gallery album:', error);
     editErrorMessage.value =
       error.response?.data?.message ||
       (typeof error.response?.data === 'string' ? error.response.data : null) ||
-      'Failed to update photo. Please check your connection and try again.';
+      'Failed to update album. Please check your connection and try again.';
   } finally {
     isUpdating.value = false;
   }
@@ -1123,7 +1395,7 @@ const confirmDelete = async () => {
   try {
     await axios.delete(`/api/v1/gallery/${itemToDelete.value.id}`);
     galleryItems.value = galleryItems.value.filter(i => i.id !== itemToDelete.value.id);
-    showSuccess('Photo deleted from gallery successfully.');
+    showSuccess('Event album deleted from gallery successfully.');
     showDeleteModal.value = false;
     itemToDelete.value = null;
     await fetchGallery();
