@@ -13,7 +13,7 @@
             Manage Our Team
           </h1>
           <p class="text-slate-500 mt-1 text-sm">
-            Maintain leadership records, divisional assignment, room allocations, intercom extensions, and contact channels.
+            Maintain leadership records, divisional assignment, responsibility subjects, intercom extensions, and contact channels.
           </p>
         </div>
 
@@ -262,20 +262,20 @@
               </div>
             </div>
 
-            <!-- Room / Location & Display Order (2 Columns) -->
+            <!-- Responsibility Subject & Display Order (2 Columns) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Room / Office Location
+                  Responsibility Subject
                 </label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                    <i class="fas fa-map-marker-alt text-xs"></i>
+                    <i class="fas fa-briefcase text-xs"></i>
                   </div>
                   <input
                     v-model="form.room"
                     type="text"
-                    placeholder="e.g. Room 140, 1st Floor"
+                    placeholder="e.g. Agricultural Credit & Refinance Schemes"
                     class="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
                   />
                 </div>
@@ -462,7 +462,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search by name, designation, division, room, extension, or email..."
+                placeholder="Search by name, designation, division, subject, extension, or email..."
                 class="w-full pl-10 pr-9 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800"
               />
               <button
@@ -552,9 +552,9 @@
 
                   <!-- Location & Contacts Tags (Residence Phone Removed) -->
                   <div class="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-500">
-                    <span v-if="member.room" class="inline-flex items-center gap-1 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
-                      <i class="fas fa-map-marker-alt text-teal-600 text-[10px]"></i>
-                      <span>{{ member.room }}</span>
+                    <span v-if="member.room" class="inline-flex items-center gap-1.5 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100 max-w-full">
+                      <i class="fas fa-briefcase text-teal-600 text-[10px] shrink-0"></i>
+                      <span class="truncate">{{ member.room }}</span>
                     </span>
 
                     <span v-if="member.extension" class="inline-flex items-center gap-1 bg-cyan-50 text-cyan-800 px-2 py-0.5 rounded-md border border-cyan-100 font-semibold">
@@ -808,19 +808,20 @@
                 </div>
               </div>
 
-              <!-- Room & Display Order (2 Columns) -->
+              <!-- Responsibility Subject & Display Order (2 Columns) -->
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div class="sm:col-span-2">
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Room / Office Location
+                    Responsibility Subject
                   </label>
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                      <i class="fas fa-map-marker-alt text-xs"></i>
+                      <i class="fas fa-briefcase text-xs"></i>
                     </div>
                     <input
                       v-model="editForm.room"
                       type="text"
+                      placeholder="e.g. Agricultural Credit & Refinance Schemes"
                       class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl hover:border-[#008795] focus:bg-white focus:ring-2 focus:ring-[#008795]/20 focus:border-[#008795] outline-none transition text-slate-800 font-medium"
                     />
                   </div>

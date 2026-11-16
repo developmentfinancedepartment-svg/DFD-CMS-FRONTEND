@@ -950,7 +950,151 @@
             </div>
           </div>
 
-          <!-- 6. PUBLISH / 3-STATE STATUS SELECTOR -->
+          <!-- 6. OPERATIONAL GUIDELINES (PDF) UPLOAD -->
+          <div class="space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                  <i class="fas fa-file-pdf text-red-500 text-sm"></i>
+                  Operational Guidelines (PDF)
+                </label>
+                <p class="text-[11px] text-slate-500 mt-0.5">
+                  Attach official guidelines, circular, or scheme manual (PDF format only, max 25MB)
+                </p>
+              </div>
+              <span v-if="form.operationalGuidelineUrl || selectedGuidelineFile" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                PDF Attached
+              </span>
+            </div>
+
+            <!-- Existing Guideline PDF Display (when not replacing with newly selected file) -->
+            <div
+              v-if="form.operationalGuidelineUrl && !selectedGuidelineFile"
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-white border border-teal-200/80 shadow-xs"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-100 text-red-600 flex items-center justify-center shrink-0">
+                  <i class="fas fa-file-pdf text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-slate-900 truncate" :title="form.operationalGuidelineFileName || getFileNameFromUrl(form.operationalGuidelineUrl)">
+                    {{ form.operationalGuidelineFileName || getFileNameFromUrl(form.operationalGuidelineUrl) || 'Operational_Guidelines.pdf' }}
+                  </div>
+                  <div class="text-[11px] text-teal-700 font-medium flex items-center gap-2 mt-0.5">
+                    <span>Uploaded Guideline</span>
+                    <span>&bull;</span>
+                    <a
+                      :href="getGuidelineDownloadUrl(form.operationalGuidelineUrl)"
+                      target="_blank"
+                      download
+                      class="text-[#008795] hover:text-[#006071] underline font-semibold flex items-center gap-1"
+                    >
+                      <span>Preview / Download</span>
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                <button
+                  type="button"
+                  @click="triggerGuidelineFileInput"
+                  class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition flex items-center gap-1.5"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Replace PDF
+                </button>
+                <button
+                  type="button"
+                  @click="removeGuidelineFile"
+                  class="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-semibold text-red-600 hover:bg-red-50 transition flex items-center gap-1.5"
+                  title="Remove this PDF guideline"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Remove
+                </button>
+              </div>
+            </div>
+
+            <!-- Newly Selected File Preview (Ready to upload on save) -->
+            <div
+              v-else-if="selectedGuidelineFile"
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-teal-50/60 border border-teal-300 shadow-xs"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                  <i class="fas fa-file-pdf text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-bold text-slate-900 truncate" :title="selectedGuidelineFile.name">
+                    {{ selectedGuidelineFile.name }}
+                  </div>
+                  <div class="text-[11px] text-teal-800 font-medium flex items-center gap-2 mt-0.5">
+                    <span>{{ formatBytes(selectedGuidelineFile.size) }}</span>
+                    <span>&bull;</span>
+                    <span class="text-amber-700 font-semibold">Ready to upload on save</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                <button
+                  type="button"
+                  @click="triggerGuidelineFileInput"
+                  class="px-3 py-1.5 rounded-lg border border-teal-200 text-xs font-semibold text-teal-800 hover:bg-teal-100 transition"
+                >
+                  Change
+                </button>
+                <button
+                  type="button"
+                  @click="cancelSelectedGuidelineFile"
+                  class="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-semibold text-red-600 hover:bg-red-50 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <!-- Empty Dropzone / File Picker (when no PDF attached and none selected) -->
+            <div
+              v-else
+              @click="triggerGuidelineFileInput"
+              class="border-2 border-dashed border-slate-200 hover:border-[#008795] rounded-xl p-5 text-center cursor-pointer bg-white hover:bg-cyan-50/20 transition-all group"
+            >
+              <div class="w-10 h-10 mx-auto rounded-full bg-slate-100 group-hover:bg-cyan-100 text-slate-500 group-hover:text-[#008795] flex items-center justify-center transition-colors mb-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+              <p class="text-xs font-bold text-slate-700 group-hover:text-[#008795] transition-colors mb-0.5">
+                Click to select Operational Guidelines PDF
+              </p>
+              <p class="text-[11px] text-slate-400 mb-0">
+                Adobe Acrobat Document (.pdf) up to 25 MB
+              </p>
+            </div>
+
+            <!-- Hidden Actual File Input -->
+            <input
+              type="file"
+              ref="guidelineFileInput"
+              accept=".pdf,application/pdf"
+              @change="onGuidelineFileSelected"
+              class="hidden"
+            />
+          </div>
+
+          <!-- 7. PUBLISH / 3-STATE STATUS SELECTOR -->
           <div class="space-y-2 pt-1">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -1190,6 +1334,8 @@ const defaultForm = () => ({
   implementationArrangements: '',
   otherInitiatives: '',
   contactInfo: '',
+  operationalGuidelineUrl: '',
+  operationalGuidelineFileName: '',
   purpose: '',
   eligibility: '',
   participatingBanks: '',
@@ -1200,6 +1346,60 @@ const defaultForm = () => ({
 });
 
 const form = ref(defaultForm());
+
+// Guideline PDF File State & Helpers
+const selectedGuidelineFile = ref(null);
+const guidelineFileInput = ref(null);
+
+const triggerGuidelineFileInput = () => {
+  if (guidelineFileInput.value) {
+    guidelineFileInput.value.click();
+  }
+};
+
+const onGuidelineFileSelected = (e) => {
+  const file = e.target?.files?.[0];
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+    alert('Please select a valid PDF file for the Operational Guidelines.');
+    if (e.target) e.target.value = '';
+    return;
+  }
+  selectedGuidelineFile.value = file;
+};
+
+const cancelSelectedGuidelineFile = () => {
+  selectedGuidelineFile.value = null;
+  if (guidelineFileInput.value) guidelineFileInput.value.value = '';
+};
+
+const removeGuidelineFile = () => {
+  form.value.operationalGuidelineUrl = '';
+  form.value.operationalGuidelineFileName = '';
+  selectedGuidelineFile.value = null;
+  if (guidelineFileInput.value) guidelineFileInput.value.value = '';
+};
+
+const getFileNameFromUrl = (url) => {
+  if (!url || typeof url !== 'string') return '';
+  const parts = url.split('/');
+  const raw = parts[parts.length - 1] || '';
+  return raw.replace(/^\d+_/, '');
+};
+
+const getGuidelineDownloadUrl = (url) => {
+  if (!url) return '#';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8096';
+  return `${apiBase.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+};
+
+const formatBytes = (bytes) => {
+  if (!bytes || isNaN(bytes)) return '0 B';
+  if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  if (bytes >= 1024) return (bytes / 1024).toFixed(0) + ' KB';
+  return bytes + ' B';
+};
 
 // Helper to determine normalized 3-state status with backward compatibility
 const getSchemeStatus = (scheme) => {
@@ -1475,6 +1675,8 @@ const toggleFieldMode = (field) => {
 const openAddModal = () => {
   isEdit.value = false;
   editingId.value = null;
+  selectedGuidelineFile.value = null;
+  if (guidelineFileInput.value) guidelineFileInput.value.value = '';
   form.value = defaultForm();
   beneficiariesPoints.value = [''];
   purposePoints.value = [''];
@@ -1488,6 +1690,8 @@ const openAddModal = () => {
 const openEditModal = (scheme) => {
   isEdit.value = true;
   editingId.value = scheme.id;
+  selectedGuidelineFile.value = null;
+  if (guidelineFileInput.value) guidelineFileInput.value.value = '';
   const rawBeneficiaries = scheme.beneficiaries || '';
   const rawPurpose = scheme.purpose || '';
   const rawRequirements = scheme.eligibility || scheme.requirements || '';
@@ -1516,6 +1720,8 @@ const openEditModal = (scheme) => {
     implementationArrangements: scheme.implementationArrangements || '',
     otherInitiatives: scheme.otherInitiatives || '',
     contactInfo: scheme.contactInfo || '',
+    operationalGuidelineUrl: scheme.operationalGuidelineUrl || scheme.guidelineFileUrl || '',
+    operationalGuidelineFileName: scheme.operationalGuidelineFileName || scheme.guidelineFileName || '',
     purpose: rawPurpose,
     eligibility: rawRequirements,
     participatingBanks: scheme.participatingBanks || '',
@@ -1529,6 +1735,7 @@ const openEditModal = (scheme) => {
 
 const closeModal = () => {
   showModal.value = false;
+  selectedGuidelineFile.value = null;
 };
 
 const saveScheme = async () => {
@@ -1553,6 +1760,26 @@ const saveScheme = async () => {
     }
 
     const payload = { ...form.value };
+
+    // Handle Operational Guideline PDF file upload if a new file was chosen
+    if (selectedGuidelineFile.value) {
+      const formData = new FormData();
+      formData.append('file', selectedGuidelineFile.value);
+      const uploadRes = await axios.post('/api/v1/services/upload-guideline', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (uploadRes.data?.url || uploadRes.data?.operationalGuidelineUrl) {
+        const fileUrl = uploadRes.data.url || uploadRes.data.operationalGuidelineUrl;
+        const fileName = uploadRes.data.fileName || uploadRes.data.operationalGuidelineFileName || selectedGuidelineFile.value.name;
+        payload.operationalGuidelineUrl = fileUrl;
+        payload.operationalGuidelineFileName = fileName;
+        form.value.operationalGuidelineUrl = fileUrl;
+        form.value.operationalGuidelineFileName = fileName;
+      }
+    } else {
+      payload.operationalGuidelineUrl = form.value.operationalGuidelineUrl || null;
+      payload.operationalGuidelineFileName = form.value.operationalGuidelineFileName || null;
+    }
 
     // Format locations as JSON array string
     if (payload.locations && typeof payload.locations === 'string') {
@@ -1582,6 +1809,7 @@ const saveScheme = async () => {
       await axios.post('/api/v1/services', payload);
     }
     showModal.value = false;
+    selectedGuidelineFile.value = null;
     await fetchSchemes();
   } catch (error) {
     console.error('Failed to save scheme:', error);
